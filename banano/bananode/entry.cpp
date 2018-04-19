@@ -120,6 +120,7 @@ int main (int argc, char * const * argv)
 		("debug_block_count", "Display the number of block")
 		("debug_bootstrap_generate", "Generate bootstrap sequence of blocks")
 		("debug_dump_representatives", "List representatives and weights")
+		("debug_dump_accounts", "List accounts and balances")
 		("debug_frontier_count", "Display the number of frontiers")
 		("debug_account_count", "Display the number of accounts")
 		("debug_mass_activity", "Generates fake debug activity")
@@ -235,6 +236,17 @@ int main (int argc, char * const * argv)
 			total += i->second;
 			std::cout << boost::str (boost::format ("%1% %2% %3%\n") % i->first.to_account () % i->second.convert_to<std::string> () % total.convert_to<std::string> ());
 		}
+	}
+	else if (vm.count ("debug_dump_accounts"))
+	{
+			rai::inactive_node node (data_path);
+			rai::transaction transaction (node.node->store.environment, nullptr, false);
+			for (auto i (node.node->store.accounts_begin (transaction)), n (node.node->store.accounts_end ()); i != n; ++i)
+			{
+				rai::account account (i->first.uint256 ());
+				rai::account_info info (i->second);
+				std::cout << boost::str (boost::format ("{\"account\":\"%1%\",\"balance\":\"%2%\"},\n") % account.to_account() % info.balance.number ());
+			}
 	}
 	else if (vm.count ("debug_frontier_count"))
 	{

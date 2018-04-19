@@ -211,6 +211,19 @@ rai::store_iterator rai::block_store::representation_end ()
 	return result;
 }
 
+
+rai::store_iterator rai::block_store::accounts_begin (MDB_txn * transaction_a)
+{
+	rai::store_iterator result (transaction_a, accounts);
+	return result;
+}
+
+rai::store_iterator rai::block_store::accounts_end ()
+{
+	rai::store_iterator result (nullptr);
+	return result;
+}
+
 rai::store_iterator rai::block_store::unchecked_begin (MDB_txn * transaction_a)
 {
 	rai::store_iterator result (transaction_a, unchecked);

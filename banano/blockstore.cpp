@@ -891,6 +891,15 @@ size_t rai::block_store::frontier_count (MDB_txn * transaction_a)
 	return result;
 }
 
+size_t rai::block_store::account_count (MDB_txn * transaction_a)
+{
+	MDB_stat account_stats;
+	auto status (mdb_stat (transaction_a, accounts, &account_stats));
+	assert (status == 0);
+	auto result (account_stats.ms_entries);
+	return result;
+}
+
 void rai::block_store::account_put (MDB_txn * transaction_a, rai::account const & account_a, rai::account_info const & info_a)
 {
 	auto status (mdb_put (transaction_a, accounts, rai::mdb_val (account_a), info_a.val (), 0));

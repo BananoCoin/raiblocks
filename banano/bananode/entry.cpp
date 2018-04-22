@@ -10,33 +10,33 @@
 class xorshift128
 {
 public:
-	uint64_t s[2];
+uint64_t s[2];
 
-	uint64_t next (void)
-	{
-		uint64_t s1 = s[0];
-		const uint64_t s0 = s[1];
-		s[0] = s0;
-		s1 ^= s1 << 23; // a
-		return (s[1] = (s1 ^ s0 ^ (s1 >> 17) ^ (s0 >> 26))) + s0; // b, c
-	}
+uint64_t next (void)
+{
+	uint64_t s1 = s[0];
+	const uint64_t s0 = s[1];
+	s[0] = s0;
+	s1 ^= s1 << 23;   // a
+	return (s[1] = (s1 ^ s0 ^ (s1 >> 17) ^ (s0 >> 26))) + s0;   // b, c
+}
 };
 
 class xorshift1024
 {
 public:
-	uint64_t s[16];
-	int p;
+uint64_t s[16];
+int p;
 
-	uint64_t next (void)
-	{
-		uint64_t s0 = s[p];
-		uint64_t s1 = s[p = (p + 1) & 15];
-		s1 ^= s1 << 31; // a
-		s1 ^= s1 >> 11; // b
-		s0 ^= s0 >> 30; // c
-		return (s[p] = s0 ^ s1) * 1181783497276652981LL;
-	}
+uint64_t next (void)
+{
+	uint64_t s0 = s[p];
+	uint64_t s1 = s[p = (p + 1) & 15];
+	s1 ^= s1 << 31;   // a
+	s1 ^= s1 >> 11;   // b
+	s0 ^= s0 >> 30;   // c
+	return (s[p] = s0 ^ s1) * 1181783497276652981LL;
+}
 };
 
 void fill_128_reference (void * data)
@@ -114,26 +114,26 @@ int main (int argc, char * const * argv)
 
 	// clang-format off
 	description.add_options ()
-		("help", "Print out options")
-		("version", "Prints out version")
-		("daemon", "Start node daemon")
-		("debug_block_count", "Display the number of block")
-		("debug_bootstrap_generate", "Generate bootstrap sequence of blocks")
-		("debug_dump_representatives", "List representatives and weights")
-		("debug_dump_accounts", "List accounts and balances")
-		("debug_frontier_count", "Display the number of frontiers")
-		("debug_account_count", "Display the number of accounts")
-		("debug_mass_activity", "Generates fake debug activity")
-		("debug_profile_generate", "Profile work generation")
-		("debug_opencl", "OpenCL work generation")
-		("debug_profile_verify", "Profile work verification")
-		("debug_profile_kdf", "Profile kdf function")
-		("debug_verify_profile", "Profile signature verification")
-		("debug_profile_sign", "Profile signature generation")
-		("debug_xorshift_profile", "Profile xorshift algorithms")
-		("platform", boost::program_options::value<std::string> (), "Defines the <platform> for OpenCL commands")
-		("device", boost::program_options::value<std::string> (), "Defines <device> for OpenCL command")
-		("threads", boost::program_options::value<std::string> (), "Defines <threads> count for OpenCL command");
+	  ("help", "Print out options")
+	  ("version", "Prints out version")
+	  ("daemon", "Start node daemon")
+	  ("debug_block_count", "Display the number of block")
+	  ("debug_bootstrap_generate", "Generate bootstrap sequence of blocks")
+	  ("debug_dump_representatives", "List representatives and weights")
+	  ("debug_dump_accounts", "List accounts and balances")
+	  ("debug_frontier_count", "Display the number of frontiers")
+	  ("debug_account_count", "Display the number of accounts")
+	  ("debug_mass_activity", "Generates fake debug activity")
+	  ("debug_profile_generate", "Profile work generation")
+	  ("debug_opencl", "OpenCL work generation")
+	  ("debug_profile_verify", "Profile work verification")
+	  ("debug_profile_kdf", "Profile kdf function")
+	  ("debug_verify_profile", "Profile signature verification")
+	  ("debug_profile_sign", "Profile signature generation")
+	  ("debug_xorshift_profile", "Profile xorshift algorithms")
+	  ("platform", boost::program_options::value<std::string> (), "Defines the <platform> for OpenCL commands")
+	  ("device", boost::program_options::value<std::string> (), "Defines <device> for OpenCL command")
+	  ("threads", boost::program_options::value<std::string> (), "Defines <threads> count for OpenCL command");
 	// clang-format on
 
 	boost::program_options::variables_map vm;
@@ -239,16 +239,21 @@ int main (int argc, char * const * argv)
 	}
 	else if (vm.count ("debug_dump_accounts"))
 	{
-			rai::inactive_node node (data_path);
-			rai::transaction transaction (node.node->store.environment, nullptr, false);
-			rai::uint128_t ix = 1;
-			for (auto i (node.node->store.accounts_begin (transaction)), n (node.node->store.accounts_end ()); i != n; ++i)
-			{
-				rai::account account (i->first.uint256 ());
-				rai::account_info info (i->second);
-				std::cout << boost::str (boost::format ("{\"ix\":\"%1%\",\"account\":\"%2%\",\"balance\":\"%3%\"},\n") % ix % account.to_account() % info.balance.number ());
-				ix++;
+		rai::inactive_node node (data_path);
+		rai::transaction transaction (node.node->store.environment, nullptr, false);
+		rai::uint128_t ix = 1;
+		std::cout << "[\n";
+		for (auto i (node.node->store.accounts_begin (transaction)), n (node.node->store.accounts_end ()); i != n; ++i)
+		{
+			rai::account account (i->first.uint256 ());
+			rai::account_info info (i->second);
+			if(ix > 1) {
+				std::cout << "\t,\n";
 			}
+			std::cout << boost::str (boost::format ("\t{\"ix\":\"%1%\",\"account\":\"%2%\",\"balance\":\"%3%\"}\n") % ix % account.to_account() % info.balance.number ());
+			ix++;
+		}
+		std::cout << "]\n";
 	}
 	else if (vm.count ("debug_frontier_count"))
 	{
@@ -273,7 +278,7 @@ int main (int argc, char * const * argv)
 		rai::uint256_union result;
 		rai::uint256_union salt (0);
 		std::string password ("");
-		for (; true;)
+		for (; true; )
 		{
 			auto begin1 (std::chrono::high_resolution_clock::now ());
 			auto success (argon2_hash (1, rai::wallet_store::kdf_work, 1, password.data (), password.size (), salt.bytes.data (), salt.bytes.size (), result.bytes.data (), result.bytes.size (), NULL, 0, Argon2_d, 0x10));
@@ -351,9 +356,9 @@ int main (int argc, char * const * argv)
 						rai::logging logging;
 						auto opencl (rai::opencl_work::create (true, { platform, device, threads }, logging));
 						rai::work_pool work_pool (std::numeric_limits<unsigned>::max (), opencl ? [&opencl](rai::uint256_union const & root_a) {
-							return opencl->generate_work (root_a);
-						}
-						                                                                        : std::function<boost::optional<uint64_t> (rai::uint256_union const &)> (nullptr));
+						                            return opencl->generate_work (root_a);
+																			}
+																			: std::function<boost::optional<uint64_t> (rai::uint256_union const &)> (nullptr));
 						rai::change_block block (0, 0, rai::keypair ().prv, 0, 0);
 						std::cerr << boost::str (boost::format ("Starting OpenCL generation profiling. Platform: %1%. Device: %2%. Threads: %3%\n") % platform % device % threads);
 						for (uint64_t i (0); true; ++i)

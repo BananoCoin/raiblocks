@@ -83,7 +83,7 @@ bool rai::uint256_union::decode_account (std::string const & source_a)
 		error = (ban_prefix && source_a.size () != 64) || (banano_prefix && source_a.size () != 67);
 		if (!error)
 		{
-			if (xrb_prefix || nano_prefix)
+			if (ban_prefix || banano_prefix)
 			{
 				auto i (source_a.begin () + (xrb_prefix ? 4 : 5));
 				if (*i == '1' || *i == '3')

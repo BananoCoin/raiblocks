@@ -23,7 +23,7 @@ struct hash<rai::uint256_union>
 }
 namespace rai
 {
-const uint8_t protocol_version = 0x09;
+const uint8_t protocol_version = 0x0a;
 const uint8_t protocol_version_min = 0x07;
 
 class block_store;
@@ -43,8 +43,9 @@ public:
 	void state_block (rai::state_block const &) override;
 	MDB_txn * transaction;
 	rai::block_store & store;
-	rai::block_hash current;
-	rai::uint128_t result;
+	rai::block_hash current_balance;
+	rai::block_hash current_amount;
+	rai::uint128_t balance;
 };
 
 /**
@@ -64,8 +65,9 @@ public:
 	void from_send (rai::block_hash const &);
 	MDB_txn * transaction;
 	rai::block_store & store;
-	rai::block_hash current;
-	rai::uint128_t result;
+	rai::block_hash current_amount;
+	rai::block_hash current_balance;
+	rai::uint128_t amount;
 };
 
 /**
@@ -128,7 +130,7 @@ public:
 };
 
 /**
- * Information on an uncollected send, source account, amount, target account.
+ * Information on an uncollected send
  */
 class pending_info
 {
@@ -193,6 +195,8 @@ public:
 	bool operator!= (rai::vote const &) const;
 	void serialize (rai::stream &, rai::block_type);
 	void serialize (rai::stream &);
+	bool deserialize (rai::stream &);
+	bool validate ();
 	std::string to_json () const;
 	// Vote round sequence number
 	uint64_t sequence;
@@ -208,12 +212,6 @@ enum class vote_code
 	replay, // Vote does not have the highest sequence number, it's a replay
 	vote // Vote has the highest sequence number
 };
-class vote_result
-{
-public:
-	rai::vote_code code;
-	std::shared_ptr<rai::vote> vote;
-};
 
 enum class process_result
 {
@@ -225,9 +223,6 @@ enum class process_result
 	unreceivable, // Source block doesn't exist or has already been received
 	gap_previous, // Block marked as previous is unknown
 	gap_source, // Block marked as source is unknown
-	state_block_disabled, // Awaiting state block canary block
-	not_receive_from_send, // Receive does not have a send source
-	account_mismatch, // Account number in open block doesn't match send destination
 	opened_burn_account, // The impossible happened, someone found the private key associated with the public key '0'.
 	balance_mismatch, // Balance and amount delta don't match
 	block_position // This block cannot follow the previous block

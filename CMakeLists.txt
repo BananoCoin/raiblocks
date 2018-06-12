@@ -1,18 +1,15 @@
 cmake_minimum_required (VERSION 2.8.11)
 project (rai)
 
-set (CPACK_PACKAGE_VERSION_MAJOR "13")
-set (CPACK_PACKAGE_VERSION_MINOR "0")
+set (CPACK_PACKAGE_VERSION_MAJOR "14")
+set (CPACK_PACKAGE_VERSION_MINOR "1")
 set (CPACK_PACKAGE_VERSION_PATCH "0")
 if (DEFINED GIT_COMMIT)
 set (CPACK_PACKAGE_VERSION_PATCH "GIT-${GIT_COMMIT}")
 endif (DEFINED GIT_COMMIT)
 set (CPACK_PACKAGE_VENDOR "Banano Currency")
 
-set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-
-set(CMAKE_INSTALL_RPATH "\$ORIGIN/../lib:\$ORIGIN/")
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_INSTALL_RPATH "@executable_path/../Frameworks")
 
 set (BANANO_GUI OFF CACHE BOOL "")
 set (BANANO_TEST OFF CACHE BOOL "")
@@ -315,6 +312,8 @@ add_library (node
 	banano/node/testing.cpp
 	banano/node/wallet.hpp
 	banano/node/wallet.cpp
+	banano/node/stats.hpp
+	banano/node/stats.cpp
 	banano/node/working.hpp
 	banano/node/xorshift.hpp)
 

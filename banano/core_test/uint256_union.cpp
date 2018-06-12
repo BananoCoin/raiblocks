@@ -307,7 +307,7 @@ TEST (uint256_union, big_endian_union_function)
 	ASSERT_EQ (rai::uint512_t (1), bytes2.number ());
 }
 
-TEST (uint256_union, decode_account_v1)
+TEST (uint256_union, decode_nano_variant)
 {
 	rai::uint256_union key;
 	ASSERT_FALSE (key.decode_account ("TR6ZJ4pdp6HC76xMRpVDny5x2s8AEbrhFue3NKVxYYdmKuTEib"));

@@ -480,45 +480,6 @@ TEST (block_store, latest_exists)
 	ASSERT_FALSE (store.account_exists (transaction, one));
 }
 
-TEST (block_store, unsynced)
-{
-	bool init (false);
-	rai::block_store store (init, rai::unique_path ());
-	ASSERT_TRUE (!init);
-	rai::transaction transaction (store.environment, nullptr, true);
-	ASSERT_EQ (store.unsynced_end (), store.unsynced_begin (transaction));
-	rai::block_hash hash1 (0);
-	ASSERT_FALSE (store.unsynced_exists (transaction, hash1));
-	store.unsynced_put (transaction, hash1);
-	ASSERT_TRUE (store.unsynced_exists (transaction, hash1));
-	ASSERT_NE (store.unsynced_end (), store.unsynced_begin (transaction));
-	ASSERT_EQ (hash1, rai::uint256_union (store.unsynced_begin (transaction)->first.uint256 ()));
-	store.unsynced_del (transaction, hash1);
-	ASSERT_FALSE (store.unsynced_exists (transaction, hash1));
-	ASSERT_EQ (store.unsynced_end (), store.unsynced_begin (transaction));
-}
-
-TEST (block_store, unsynced_iteration)
-{
-	bool init (false);
-	rai::block_store store (init, rai::unique_path ());
-	ASSERT_TRUE (!init);
-	rai::transaction transaction (store.environment, nullptr, true);
-	ASSERT_EQ (store.unsynced_end (), store.unsynced_begin (transaction));
-	rai::block_hash hash1 (1);
-	store.unsynced_put (transaction, hash1);
-	rai::block_hash hash2 (2);
-	store.unsynced_put (transaction, hash2);
-	std::unordered_set<rai::block_hash> hashes;
-	for (auto i (store.unsynced_begin (transaction)), n (store.unsynced_end ()); i != n; ++i)
-	{
-		hashes.insert (rai::uint256_union (i->first.uint256 ()));
-	}
-	ASSERT_EQ (2, hashes.size ());
-	ASSERT_TRUE (hashes.find (hash1) != hashes.end ());
-	ASSERT_TRUE (hashes.find (hash2) != hashes.end ());
-}
-
 TEST (block_store, large_iteration)
 {
 	bool init (false);
@@ -588,16 +549,15 @@ TEST (block_store, block_count)
 	ASSERT_EQ (1, store.block_count (rai::transaction (store.environment, nullptr, false)).sum ());
 }
 
-TEST (block_store, frontier_count)
+TEST (block_store, account_count)
 {
 	bool init (false);
 	rai::block_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
-	ASSERT_EQ (0, store.frontier_count (rai::transaction (store.environment, nullptr, false)));
-	rai::block_hash hash (100);
+	ASSERT_EQ (0, store.account_count (rai::transaction (store.environment, nullptr, false)));
 	rai::account account (200);
-	store.frontier_put (rai::transaction (store.environment, nullptr, true), hash, account);
-	ASSERT_EQ (1, store.frontier_count (rai::transaction (store.environment, nullptr, false)));
+	store.account_put (rai::transaction (store.environment, nullptr, true), account, rai::account_info ());
+	ASSERT_EQ (1, store.account_count (rai::transaction (store.environment, nullptr, false)));
 }
 
 TEST (block_store, sequence_increment)
@@ -643,7 +603,8 @@ TEST (block_store, upgrade_v2_v3)
 		rai::genesis genesis;
 		auto hash (genesis.hash ());
 		genesis.initialize (transaction, store);
-		rai::ledger ledger (store);
+		rai::stat stats;
+		rai::ledger ledger (store, stats);
 		rai::change_block change (hash, key1.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 		change_hash = change.hash ();
 		ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, change).code);
@@ -664,7 +625,8 @@ TEST (block_store, upgrade_v2_v3)
 	}
 	bool init (false);
 	rai::block_store store (init, path);
-	rai::ledger ledger (store);
+	rai::stat stats;
+	rai::ledger ledger (store, stats);
 	rai::transaction transaction (store.environment, nullptr, true);
 	ASSERT_TRUE (!init);
 	ASSERT_LT (2, store.version_get (transaction));
@@ -693,7 +655,8 @@ TEST (block_store, upgrade_v3_v4)
 	}
 	bool init (false);
 	rai::block_store store (init, path);
-	rai::ledger ledger (store);
+	rai::stat stats;
+	rai::ledger ledger (store, stats);
 	rai::transaction transaction (store.environment, nullptr, true);
 	ASSERT_FALSE (init);
 	ASSERT_LT (3, store.version_get (transaction));
@@ -717,7 +680,8 @@ TEST (block_store, upgrade_v4_v5)
 		rai::transaction transaction (store.environment, nullptr, true);
 		rai::genesis genesis;
 		genesis.initialize (transaction, store);
-		rai::ledger ledger (store);
+		rai::stat stats;
+		rai::ledger ledger (store, stats);
 		store.version_put (transaction, 4);
 		rai::account_info info;
 		store.account_get (transaction, rai::test_genesis_key.pub, info);
@@ -931,7 +895,8 @@ TEST (block_store, upgrade_v9_v10)
 		rai::transaction transaction (store.environment, nullptr, true);
 		rai::genesis genesis;
 		genesis.initialize (transaction, store);
-		rai::ledger ledger (store);
+		rai::stat stats;
+		rai::ledger ledger (store, stats);
 		store.version_put (transaction, 9);
 		rai::account_info info;
 		store.account_get (transaction, rai::test_genesis_key.pub, info);

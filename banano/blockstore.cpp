@@ -251,7 +251,6 @@ pending (0),
 blocks_info (0),
 representation (0),
 unchecked (0),
-unsynced (0),
 checksum (0)
 {
 	if (!error_a)
@@ -268,7 +267,6 @@ checksum (0)
 		error_a |= mdb_dbi_open (transaction, "blocks_info", MDB_CREATE, &blocks_info) != 0;
 		error_a |= mdb_dbi_open (transaction, "representation", MDB_CREATE, &representation) != 0;
 		error_a |= mdb_dbi_open (transaction, "unchecked", MDB_CREATE | MDB_DUPSORT, &unchecked) != 0;
-		error_a |= mdb_dbi_open (transaction, "unsynced", MDB_CREATE, &unsynced) != 0;
 		error_a |= mdb_dbi_open (transaction, "checksum", MDB_CREATE, &checksum) != 0;
 		error_a |= mdb_dbi_open (transaction, "vote", MDB_CREATE, &vote) != 0;
 		error_a |= mdb_dbi_open (transaction, "meta", MDB_CREATE, &meta) != 0;
@@ -330,6 +328,8 @@ void rai::block_store::do_upgrades (MDB_txn * transaction_a)
 		case 9:
 			upgrade_v9_to_v10 (transaction_a);
 		case 10:
+			upgrade_v10_to_v11 (transaction_a);
+		case 11:
 			break;
 		default:
 			assert (false);
@@ -524,6 +524,13 @@ void rai::block_store::upgrade_v9_to_v10 (MDB_txn * transaction_a)
 	//std::cerr << boost::str (boost::format ("Database upgrade is completed\n"));
 }
 
+void rai::block_store::upgrade_v10_to_v11 (MDB_txn * transaction_a)
+{
+	MDB_dbi unsynced;
+	mdb_dbi_open (transaction_a, "unsynced", MDB_CREATE | MDB_DUPSORT, &unsynced);
+	mdb_drop (transaction_a, unsynced, 1);
+}
+
 void rai::block_store::clear (MDB_dbi db_a)
 {
 	rai::transaction transaction (environment, nullptr, true);
@@ -535,7 +542,7 @@ rai::uint128_t rai::block_store::block_balance (MDB_txn * transaction_a, rai::bl
 {
 	balance_visitor visitor (transaction_a, *this);
 	visitor.compute (hash_a);
-	return visitor.result;
+	return visitor.balance;
 }
 
 void rai::block_store::representation_add (MDB_txn * transaction_a, rai::block_hash const & source_a, rai::uint128_t const & amount_a)
@@ -825,6 +832,11 @@ rai::block_counts rai::block_store::block_count (MDB_txn * transaction_a)
 	return result;
 }
 
+bool rai::block_store::root_exists (MDB_txn * transaction_a, rai::uint256_union const & root_a)
+{
+	return block_exists (transaction_a, root_a) || account_exists (transaction_a, root_a);
+}
+
 void rai::block_store::account_del (MDB_txn * transaction_a, rai::account const & account_a)
 {
 	auto status (mdb_del (transaction_a, accounts, rai::mdb_val (account_a), nullptr));
@@ -881,10 +893,10 @@ void rai::block_store::frontier_del (MDB_txn * transaction_a, rai::block_hash co
 	assert (status == 0);
 }
 
-size_t rai::block_store::frontier_count (MDB_txn * transaction_a)
+size_t rai::block_store::account_count (MDB_txn * transaction_a)
 {
 	MDB_stat frontier_stats;
-	auto status (mdb_stat (transaction_a, frontiers, &frontier_stats));
+	auto status (mdb_stat (transaction_a, accounts, &frontier_stats));
 	assert (status == 0);
 	auto result (frontier_stats.ms_entries);
 	return result;
@@ -1115,39 +1127,6 @@ size_t rai::block_store::unchecked_count (MDB_txn * transaction_a)
 	assert (status == 0);
 	auto result (unchecked_stats.ms_entries);
 	return result;
-}
-
-void rai::block_store::unsynced_put (MDB_txn * transaction_a, rai::block_hash const & hash_a)
-{
-	auto status (mdb_put (transaction_a, unsynced, rai::mdb_val (hash_a), rai::mdb_val (0, nullptr), 0));
-	assert (status == 0);
-}
-
-void rai::block_store::unsynced_del (MDB_txn * transaction_a, rai::block_hash const & hash_a)
-{
-	auto status (mdb_del (transaction_a, unsynced, rai::mdb_val (hash_a), nullptr));
-	assert (status == 0);
-}
-
-bool rai::block_store::unsynced_exists (MDB_txn * transaction_a, rai::block_hash const & hash_a)
-{
-	auto iterator (unsynced_begin (transaction_a, hash_a));
-	return iterator != rai::store_iterator (nullptr) && rai::block_hash (iterator->first.uint256 ()) == hash_a;
-}
-
-rai::store_iterator rai::block_store::unsynced_begin (MDB_txn * transaction_a)
-{
-	return rai::store_iterator (transaction_a, unsynced);
-}
-
-rai::store_iterator rai::block_store::unsynced_begin (MDB_txn * transaction_a, rai::uint256_union const & val_a)
-{
-	return rai::store_iterator (transaction_a, unsynced, rai::mdb_val (val_a));
-}
-
-rai::store_iterator rai::block_store::unsynced_end ()
-{
-	return rai::store_iterator (nullptr);
 }
 
 void rai::block_store::checksum_put (MDB_txn * transaction_a, uint64_t prefix, uint8_t mask, rai::uint256_union const & hash_a)

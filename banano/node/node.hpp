@@ -117,7 +117,7 @@ public:
 	static unsigned constexpr announcement_min = 4;
 	// Threshold to start logging blocks haven't yet been confirmed
 	static unsigned constexpr announcement_long = 20;
-	static unsigned constexpr announce_interval_ms = (rai::rai_network == rai::rai_networks::rai_test_network) ? 10 : 16000;
+	static unsigned constexpr announce_interval_ms = (rai::banano_network == rai::banano_networks::banano_test_network) ? 10 : 16000;
 	static size_t constexpr election_history_size = 2048;
 };
 class operation
@@ -365,15 +365,11 @@ public:
 	boost::asio::ip::udp::resolver resolver;
 	rai::node & node;
 	bool on;
-<<<<<<< HEAD:banano/node/node.hpp
 	uint64_t insufficient_work_count;
 	uint64_t error_count;
 	rai::message_statistics incoming;
 	rai::message_statistics outgoing;
 	static uint16_t const node_port = rai::banano_network == rai::banano_networks::banano_live_network ? 7071 : 54000;
-=======
-	static uint16_t const node_port = rai::rai_network == rai::rai_networks::rai_live_network ? 7075 : 54000;
->>>>>>> V14.1:rai/node/node.hpp
 };
 class logging
 {

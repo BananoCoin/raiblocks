@@ -365,10 +365,6 @@ public:
 	boost::asio::ip::udp::resolver resolver;
 	rai::node & node;
 	bool on;
-	uint64_t insufficient_work_count;
-	uint64_t error_count;
-	rai::message_statistics incoming;
-	rai::message_statistics outgoing;
 	static uint16_t const node_port = rai::banano_network == rai::banano_networks::banano_live_network ? 7071 : 54000;
 };
 class logging

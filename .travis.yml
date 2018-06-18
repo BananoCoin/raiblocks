@@ -15,7 +15,7 @@ matrix:
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo mkdir -p /etc/docker && echo '{"ipv6":true,"fixed-cidr-v6":"2001:db8:1::/64"}' | sudo tee /etc/docker/daemon.json && sudo service docker restart; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ci/build-docker-image.sh docker/ci/Dockerfile derpalmer/bananotest; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ci/build-docker-image.sh docker/ci/Dockerfile bananocoin/banano; fi
 
 script:
   - echo "BANANO"

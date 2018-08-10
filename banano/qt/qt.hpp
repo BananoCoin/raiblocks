@@ -270,6 +270,19 @@ public:
 	banano_qt::wallet & wallet;
 	void refresh_stats ();
 };
+class stats_viewer
+{
+public:
+	stats_viewer (rai_qt::wallet &);
+	QWidget * window;
+	QVBoxLayout * layout;
+	QPushButton * refresh;
+	QStandardItemModel * model;
+	QTableView * view;
+	QPushButton * back;
+	rai_qt::wallet & wallet;
+	void refresh_stats ();
+};
 enum class status_types
 {
 	not_a_status,

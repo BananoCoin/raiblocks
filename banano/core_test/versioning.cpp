@@ -1,7 +1,12 @@
 #include <gtest/gtest.h>
 
+<<<<<<< HEAD:banano/core_test/versioning.cpp
 #include <banano/blockstore.hpp>
 #include <banano/versioning.hpp>
+=======
+#include <rai/secure/blockstore.hpp>
+#include <rai/secure/versioning.hpp>
+>>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/versioning.cpp
 
 TEST (versioning, account_info_v1)
 {
@@ -15,7 +20,7 @@ TEST (versioning, account_info_v1)
 		ASSERT_FALSE (error);
 		rai::transaction transaction (store.environment, nullptr, true);
 		store.block_put (transaction, open.hash (), open);
-		auto status (mdb_put (transaction, store.accounts, rai::mdb_val (account), v1.val (), 0));
+		auto status (mdb_put (transaction, store.accounts_v0, rai::mdb_val (account), v1.val (), 0));
 		ASSERT_EQ (0, status);
 		store.version_put (transaction, 1);
 	}

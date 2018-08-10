@@ -1,9 +1,15 @@
 #pragma once
 
 #include <boost/optional.hpp>
+<<<<<<< HEAD:banano/lib/work.hpp
 #include <banano/config.hpp>
 #include <banano/lib/numbers.hpp>
 #include <banano/lib/utility.hpp>
+=======
+#include <rai/lib/config.hpp>
+#include <rai/lib/numbers.hpp>
+#include <rai/lib/utility.hpp>
+>>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/lib/work.hpp
 
 #include <atomic>
 #include <condition_variable>

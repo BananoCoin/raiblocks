@@ -1,7 +1,7 @@
 #pragma once
 
-#include <banano/blockstore.hpp>
-#include <banano/common.hpp>
+#include <banano/secure/blockstore.hpp>
+#include <banano/secure/common.hpp>
 #include <banano/node/common.hpp>
 #include <banano/node/openclwork.hpp>
 

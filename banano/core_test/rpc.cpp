@@ -819,7 +819,7 @@ TEST (rpc, frontier)
 		{
 			rai::keypair key;
 			source[key.pub] = key.prv.data;
-			system.nodes[0]->store.account_put (transaction, key.pub, rai::account_info (key.prv.data, 0, 0, 0, 0, 0));
+			system.nodes[0]->store.account_put (transaction, key.pub, rai::account_info (key.prv.data, 0, 0, 0, 0, 0, rai::epoch::epoch_0));
 		}
 	}
 	rai::keypair key;
@@ -859,7 +859,7 @@ TEST (rpc, frontier_limited)
 		{
 			rai::keypair key;
 			source[key.pub] = key.prv.data;
-			system.nodes[0]->store.account_put (transaction, key.pub, rai::account_info (key.prv.data, 0, 0, 0, 0, 0));
+			system.nodes[0]->store.account_put (transaction, key.pub, rai::account_info (key.prv.data, 0, 0, 0, 0, 0, rai::epoch::epoch_0));
 		}
 	}
 	rai::keypair key;
@@ -889,7 +889,7 @@ TEST (rpc, frontier_startpoint)
 		{
 			rai::keypair key;
 			source[key.pub] = key.prv.data;
-			system.nodes[0]->store.account_put (transaction, key.pub, rai::account_info (key.prv.data, 0, 0, 0, 0, 0));
+			system.nodes[0]->store.account_put (transaction, key.pub, rai::account_info (key.prv.data, 0, 0, 0, 0, 0, rai::epoch::epoch_0));
 		}
 	}
 	rai::keypair key;
@@ -922,7 +922,11 @@ TEST (rpc, history)
 	ASSERT_NE (nullptr, receive);
 	auto node0 (system.nodes[0]);
 	rai::genesis genesis;
+<<<<<<< HEAD:banano/core_test/rpc.cpp
 	rai::state_block usend (rai::genesis_account, node0->latest (rai::genesis_account), rai::genesis_account, rai::genesis_amount - rai::kBAN_ratio, rai::genesis_account, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
+=======
+	rai::state_block usend (rai::genesis_account, node0->latest (rai::genesis_account), rai::genesis_account, rai::genesis_amount - rai::Gxrb_ratio, rai::genesis_account, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
+>>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/rpc.cpp
 	rai::state_block ureceive (rai::genesis_account, usend.hash (), rai::genesis_account, rai::genesis_amount, usend.hash (), rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	rai::state_block uchange (rai::genesis_account, ureceive.hash (), rai::keypair ().pub, rai::genesis_amount, 0, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	{
@@ -1164,7 +1168,11 @@ TEST (rpc, payment_begin_end)
 	auto root1 (system.nodes[0]->ledger.latest_root (rai::transaction (wallet->store.environment, nullptr, false), account));
 	uint64_t work (0);
 	auto iteration (0);
-	ASSERT_TRUE (rai::work_validate (root1, work));
+	while (!rai::work_validate (root1, work))
+	{
+		++work;
+		ASSERT_LT (work, 50);
+	}
 	while (rai::work_validate (root1, work))
 	{
 		system.poll ();
@@ -1415,6 +1423,8 @@ TEST (rpc, pending)
 		blocks[hash] = amount;
 		boost::optional<std::string> source (i->second.get_optional<std::string> ("source"));
 		ASSERT_FALSE (source.is_initialized ());
+		boost::optional<uint8_t> min_version (i->second.get_optional<uint8_t> ("min_version"));
+		ASSERT_FALSE (min_version.is_initialized ());
 	}
 	ASSERT_EQ (blocks[block1->hash ()], 100);
 	request.put ("threshold", "101");
@@ -1428,6 +1438,7 @@ TEST (rpc, pending)
 	ASSERT_EQ (0, blocks_node.size ());
 	request.put ("threshold", "0");
 	request.put ("source", "true");
+	request.put ("min_version", "true");
 	test_response response2 (request, rpc, system.service);
 	while (response2.status == 0)
 	{
@@ -1444,6 +1455,7 @@ TEST (rpc, pending)
 		hash.decode_hex (i->first);
 		amounts[hash].decode_dec (i->second.get<std::string> ("amount"));
 		sources[hash].decode_account (i->second.get<std::string> ("source"));
+		ASSERT_EQ (i->second.get<uint8_t> ("min_version"), 0);
 	}
 	ASSERT_EQ (amounts[block1->hash ()], 100);
 	ASSERT_EQ (sources[block1->hash ()], rai::test_genesis_key.pub);
@@ -1520,8 +1532,16 @@ TEST (rpc, version)
 	ASSERT_EQ (200, response1.status);
 	ASSERT_EQ ("1", response1.json.get<std::string> ("rpc_version"));
 	ASSERT_EQ (200, response1.status);
+<<<<<<< HEAD:banano/core_test/rpc.cpp
 	ASSERT_EQ ("10", response1.json.get<std::string> ("store_version"));
 	ASSERT_EQ (boost::str (boost::format ("Banano %1%.%2%") % BANANO_VERSION_MAJOR % BANANO_VERSION_MINOR), response1.json.get<std::string> ("node_vendor"));
+=======
+	{
+		rai::transaction transaction (system.nodes[0]->store.environment, nullptr, false);
+		ASSERT_EQ (std::to_string (node1->store.version_get (transaction)), response1.json.get<std::string> ("store_version"));
+	}
+	ASSERT_EQ (boost::str (boost::format ("RaiBlocks %1%.%2%") % RAIBLOCKS_VERSION_MAJOR % RAIBLOCKS_VERSION_MINOR), response1.json.get<std::string> ("node_vendor"));
+>>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/rpc.cpp
 	auto headers (response1.resp.base ());
 	auto allowed_origin (headers.at ("Access-Control-Allow-Origin"));
 	auto allowed_headers (headers.at ("Access-Control-Allow-Headers"));
@@ -2324,6 +2344,13 @@ TEST (rpc, accounts_pending)
 	rai::keypair key1;
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
 	auto block1 (system.wallet (0)->send_action (rai::test_genesis_key.pub, key1.pub, 100));
+	auto iterations (0);
+	while (system.nodes[0]->active.active (*block1))
+	{
+		system.poll ();
+		++iterations;
+		ASSERT_LT (iterations, 200);
+	}
 	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request;
@@ -2530,6 +2557,13 @@ TEST (rpc, wallet_pending)
 	system0.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
 	system0.wallet (0)->insert_adhoc (key1.prv);
 	auto block1 (system0.wallet (0)->send_action (rai::test_genesis_key.pub, key1.pub, 100));
+	auto iterations (0);
+	while (system0.nodes[0]->active.active (*block1))
+	{
+		system0.poll ();
+		++iterations;
+		ASSERT_LT (iterations, 200);
+	}
 	rai::rpc rpc (system0.service, *system0.nodes[0], rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request;
@@ -2542,6 +2576,7 @@ TEST (rpc, wallet_pending)
 		system0.poll ();
 	}
 	ASSERT_EQ (200, response.status);
+	ASSERT_EQ (1, response.json.get_child ("blocks").size ());
 	for (auto & pending : response.json.get_child ("blocks"))
 	{
 		std::string account_text (pending.first);
@@ -2557,6 +2592,7 @@ TEST (rpc, wallet_pending)
 	}
 	ASSERT_EQ (200, response0.status);
 	std::unordered_map<rai::block_hash, rai::uint128_union> blocks;
+	ASSERT_EQ (1, response0.json.get_child ("blocks").size ());
 	for (auto & pending : response0.json.get_child ("blocks"))
 	{
 		std::string account_text (pending.first);
@@ -2570,6 +2606,8 @@ TEST (rpc, wallet_pending)
 			blocks[hash] = amount;
 			boost::optional<std::string> source (i->second.get_optional<std::string> ("source"));
 			ASSERT_FALSE (source.is_initialized ());
+			boost::optional<uint8_t> min_version (i->second.get_optional<uint8_t> ("min_version"));
+			ASSERT_FALSE (min_version.is_initialized ());
 		}
 	}
 	ASSERT_EQ (blocks[block1->hash ()], 100);
@@ -2584,6 +2622,7 @@ TEST (rpc, wallet_pending)
 	ASSERT_EQ (0, pending1.size ());
 	request.put ("threshold", "0");
 	request.put ("source", "true");
+	request.put ("min_version", "true");
 	test_response response2 (request, rpc, system0.service);
 	while (response2.status == 0)
 	{
@@ -2592,6 +2631,7 @@ TEST (rpc, wallet_pending)
 	ASSERT_EQ (200, response2.status);
 	std::unordered_map<rai::block_hash, rai::uint128_union> amounts;
 	std::unordered_map<rai::block_hash, rai::account> sources;
+	ASSERT_EQ (1, response0.json.get_child ("blocks").size ());
 	for (auto & pending : response2.json.get_child ("blocks"))
 	{
 		std::string account_text (pending.first);
@@ -2602,6 +2642,7 @@ TEST (rpc, wallet_pending)
 			hash.decode_hex (i->first);
 			amounts[hash].decode_dec (i->second.get<std::string> ("amount"));
 			sources[hash].decode_account (i->second.get<std::string> ("source"));
+			ASSERT_EQ (i->second.get<uint8_t> ("min_version"), 0);
 		}
 	}
 	ASSERT_EQ (amounts[block1->hash ()], 100);
@@ -2649,6 +2690,7 @@ TEST (rpc, work_get)
 {
 	rai::system system (24000, 1);
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
+	system.wallet (0)->work_cache_blocking (rai::test_genesis_key.pub, system.nodes[0]->latest (rai::test_genesis_key.pub));
 	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request;
@@ -2672,6 +2714,7 @@ TEST (rpc, wallet_work_get)
 {
 	rai::system system (24000, 1);
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
+	system.wallet (0)->work_cache_blocking (rai::test_genesis_key.pub, system.nodes[0]->latest (rai::test_genesis_key.pub));
 	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request;
@@ -2882,9 +2925,10 @@ TEST (rpc, account_info)
 	std::string balance (response.json.get<std::string> ("balance"));
 	ASSERT_EQ ("100", balance);
 	std::string modified_timestamp (response.json.get<std::string> ("modified_timestamp"));
-	ASSERT_TRUE (time - stol (modified_timestamp) < 5);
+	ASSERT_LT (std::abs ((long)time - stol (modified_timestamp)), 5);
 	std::string block_count (response.json.get<std::string> ("block_count"));
 	ASSERT_EQ ("2", block_count);
+	ASSERT_EQ (0, response.json.get<uint8_t> ("account_version"));
 	boost::optional<std::string> weight (response.json.get_optional<std::string> ("weight"));
 	ASSERT_FALSE (weight.is_initialized ());
 	boost::optional<std::string> pending (response.json.get_optional<std::string> ("pending"));
@@ -3088,7 +3132,7 @@ TEST (rpc, ledger)
 		std::string balance_text (accounts.second.get<std::string> ("balance"));
 		ASSERT_EQ ("340282366920938463463374607431768211355", balance_text);
 		std::string modified_timestamp (accounts.second.get<std::string> ("modified_timestamp"));
-		ASSERT_EQ (std::to_string (time), modified_timestamp);
+		ASSERT_LT (std::abs ((long)time - stol (modified_timestamp)), 5);
 		std::string block_count (accounts.second.get<std::string> ("block_count"));
 		ASSERT_EQ ("1", block_count);
 		boost::optional<std::string> weight (accounts.second.get_optional<std::string> ("weight"));
@@ -3306,7 +3350,11 @@ TEST (rpc, block_create_state_open)
 	rai::keypair key;
 	rai::genesis genesis;
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
+<<<<<<< HEAD:banano/core_test/rpc.cpp
 	auto send_block (system.wallet (0)->send_action (rai::test_genesis_key.pub, key.pub, rai::kBAN_ratio));
+=======
+	auto send_block (system.wallet (0)->send_action (rai::test_genesis_key.pub, key.pub, rai::Gxrb_ratio));
+>>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/rpc.cpp
 	ASSERT_NE (nullptr, send_block);
 	boost::property_tree::ptree request;
 	request.put ("action", "block_create");
@@ -3466,7 +3514,7 @@ TEST (rpc, wallet_create_fail)
 	{
 		system.poll ();
 	}
-	ASSERT_EQ ("Failed to create wallet. Increase lmdb_max_dbs in node config.", response.json.get<std::string> ("error"));
+	ASSERT_EQ ("Failed to create wallet. Increase lmdb_max_dbs in node config", response.json.get<std::string> ("error"));
 }
 
 TEST (rpc, wallet_ledger)
@@ -3507,7 +3555,7 @@ TEST (rpc, wallet_ledger)
 		std::string balance_text (accounts.second.get<std::string> ("balance"));
 		ASSERT_EQ ("340282366920938463463374607431768211355", balance_text);
 		std::string modified_timestamp (accounts.second.get<std::string> ("modified_timestamp"));
-		ASSERT_EQ (std::to_string (time), modified_timestamp);
+		ASSERT_LT (std::abs ((long)time - stol (modified_timestamp)), 5);
 		std::string block_count (accounts.second.get<std::string> ("block_count"));
 		ASSERT_EQ ("1", block_count);
 		boost::optional<std::string> weight (accounts.second.get_optional<std::string> ("weight"));
@@ -3569,8 +3617,13 @@ TEST (rpc, online_reps)
 {
 	rai::system system (24000, 2);
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
+<<<<<<< HEAD:banano/core_test/rpc.cpp
 	ASSERT_TRUE (system.nodes[1]->online_reps.online_stake ().is_zero ());
 	system.wallet (0)->send_action (rai::test_genesis_key.pub, rai::test_genesis_key.pub, rai::kBAN_ratio);
+=======
+	ASSERT_TRUE (system.nodes[1]->online_reps.online_stake () == system.nodes[1]->config.online_weight_minimum.number ());
+	system.wallet (0)->send_action (rai::test_genesis_key.pub, rai::test_genesis_key.pub, rai::Gxrb_ratio);
+>>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/rpc.cpp
 	auto iterations (0);
 	while (system.nodes[1]->online_reps.online_stake () == system.nodes[1]->config.online_weight_minimum.number ())
 	{
@@ -3624,7 +3677,13 @@ TEST (rpc, confirmation_history)
 	auto hash (item->second.get<std::string> ("hash"));
 	auto tally (item->second.get<std::string> ("tally"));
 	ASSERT_EQ (block->hash ().to_string (), hash);
+<<<<<<< HEAD:banano/core_test/rpc.cpp
 	ASSERT_EQ ((rai::genesis_amount - rai::kBAN_ratio).convert_to<std::string> (), tally);
+=======
+	rai::amount tally_num;
+	tally_num.decode_dec (tally);
+	assert (tally_num == rai::genesis_amount || tally_num == (rai::genesis_amount - rai::Gxrb_ratio));
+>>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/rpc.cpp
 	system.stop ();
 }
 

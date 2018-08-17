@@ -25,7 +25,6 @@ We've applied the philosophy of "do one thing and do it well", giving you perfor
 
 For more information, see [Banano.co.in](http://banano.co.in/).
 
-<<<<<<< HEAD
 ### Resources
 - [Banano website](http://banano.co.in)
 - [Yellowpaper](http://banano.co.in/)
@@ -35,12 +34,6 @@ For more information, see [Banano.co.in](http://banano.co.in/).
 - [Fritter](http://twitter.com/bananocoin)
 - [GitHub wiki](http://github.com/bananocoin/banano/wiki)
 - [BananoVault](https://vault.banano.co.in)
-=======
-* Nano utilizes a novel [block-lattice](https://github.com/nanocurrency/raiblocks/wiki/Block-lattice) architecture, unlike conventional blockchains used in many other cryptocurrencies.
-* The network requires minimal resources, no high-power mining hardware, and can process high transaction throughput.
-* Offers instantaneous transactions with zero fees and unlimited scalability, making Nano an ideal solution for peer-to-peer transactions.
-* As of May 2018, the Nano network has processed over ten million transactions with an unpruned ledger size of only 3.8GB.
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c
 
 ### Build instructions
 - [Building Banano from source](https://github.com/BananoCoin/banano/wiki/Building-a-Bananode-from-sources)
@@ -48,33 +41,8 @@ For more information, see [Banano.co.in](http://banano.co.in/).
 ### Running a Docker node
 - [Running a Docker node](https://github.com/BananoCoin/banano/wiki/Running-a-Docker-Bananode)
 
-<<<<<<< HEAD
 ### Want to contribute?
 Please visit us on the [Discord](https://discord.gg/SBPaSBS) or our [Reddit](http://reddit.com/r/bananocoin).
-=======
-* [White Paper](https://nano.org/en/whitepaper)
-* [Build Instructions](https://github.com/nanocurrency/raiblocks/wiki/Build-Instructions)
-* [Command Line Interface](https://github.com/nanocurrency/raiblocks/wiki/Command-line-interface)
-* [RPC Protocol](https://github.com/nanocurrency/raiblocks/wiki/RPC-protocol)
-* [Wallet Design](https://github.com/nanocurrency/raiblocks/wiki/Wallet-design)
-* [Block Lattice](https://github.com/nanocurrency/raiblocks/wiki/Block-lattice)
-* [Design Features](https://github.com/nanocurrency/raiblocks/wiki/Design-features)
-
-### Links & Resources
-
-* [Nano Website](https://nano.org)
-* [Nano Roadmap](https://developers.nano.org/roadmap)
-* [Discord Chat](https://chat.nano.org/)
-* [Reddit](https://reddit.com/r/nanocurrency)
-* [Medium](https://medium.com/nanocurrency)
-* [Twitter](https://twitter.com/nano)
-* [Forum](https://forum.raiblocks.net/)
-* [GitHub wiki](https://github.com/nanocurrency/raiblocks/wiki)
-
-### Want to Contribute?
-
-Please see the [contributors guide](https://github.com/nanocurrency/raiblocks/wiki/Contributing).
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c
 
 ### Contact us
 

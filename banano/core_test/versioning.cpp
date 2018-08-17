@@ -1,12 +1,7 @@
 #include <gtest/gtest.h>
 
-<<<<<<< HEAD:banano/core_test/versioning.cpp
-#include <banano/blockstore.hpp>
-#include <banano/versioning.hpp>
-=======
-#include <rai/secure/blockstore.hpp>
-#include <rai/secure/versioning.hpp>
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/versioning.cpp
+#include <banano/secure/blockstore.hpp>
+#include <banano/secure/versioning.hpp>
 
 TEST (versioning, account_info_v1)
 {

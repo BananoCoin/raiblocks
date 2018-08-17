@@ -226,11 +226,7 @@ void rai::frontier_req_client::receive_frontier ()
 	});
 }
 
-<<<<<<< HEAD:banano/node/bootstrap.cpp
-void rai::frontier_req_client::unsynced (MDB_txn * transaction_a, rai::block_hash const & head, rai::block_hash const & end)
-=======
 void rai::frontier_req_client::unsynced (rai::block_hash const & head, rai::block_hash const & end)
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/bootstrap.cpp
 {
 	if (bulk_push_cost < bulk_push_cost_limit)
 	{
@@ -283,12 +279,7 @@ void rai::frontier_req_client::received_frontier (boost::system::error_code cons
 			while (!current.is_zero () && current < account)
 			{
 				// We know about an account they don't.
-<<<<<<< HEAD:banano/node/bootstrap.cpp
-				rai::transaction transaction (connection->node->store.environment, nullptr, true);
-				unsynced (transaction, info.head, 0);
-=======
 				unsynced (info.head, 0);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/bootstrap.cpp
 				next (transaction);
 			}
 			if (!current.is_zero ())
@@ -304,11 +295,7 @@ void rai::frontier_req_client::received_frontier (boost::system::error_code cons
 						if (connection->node->store.block_exists (transaction, latest))
 						{
 							// We know about a block they don't.
-<<<<<<< HEAD:banano/node/bootstrap.cpp
-							unsynced (transaction, info.head, latest);
-=======
 							unsynced (info.head, latest);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/bootstrap.cpp
 						}
 						else
 						{
@@ -336,15 +323,6 @@ void rai::frontier_req_client::received_frontier (boost::system::error_code cons
 		{
 			while (!current.is_zero ())
 			{
-<<<<<<< HEAD:banano/node/bootstrap.cpp
-				rai::transaction transaction (connection->node->store.environment, nullptr, true);
-				while (!current.is_zero ())
-				{
-					// We know about an account they don't.
-					unsynced (transaction, info.head, 0);
-					next (transaction);
-				}
-=======
 				// We know about an account they don't.
 				unsynced (info.head, 0);
 				next (transaction);
@@ -352,7 +330,6 @@ void rai::frontier_req_client::received_frontier (boost::system::error_code cons
 			if (connection->node->config.logging.bulk_pull_logging ())
 			{
 				BOOST_LOG (connection->node->log) << "Bulk push cost: " << bulk_push_cost;
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/bootstrap.cpp
 			}
 			if (connection->node->config.logging.bulk_pull_logging ())
 			{
@@ -1165,11 +1142,7 @@ void rai::bootstrap_initiator::bootstrap (rai::endpoint const & endpoint_a, bool
 {
 	if (add_to_peers)
 	{
-<<<<<<< HEAD:banano/node/bootstrap.cpp
-		node.peers.insert (endpoint_a, rai::protocol_version);
-=======
 		node.peers.insert (rai::map_endpoint_to_v6 (endpoint_a), rai::protocol_version);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/bootstrap.cpp
 	}
 	std::unique_lock<std::mutex> lock (mutex);
 	if (!stopped)
@@ -1361,11 +1334,6 @@ void rai::bootstrap_server::receive_header_action (boost::system::error_code con
 				case rai::message_type::bulk_pull:
 				{
 					node->stats.inc (rai::stat::type::bootstrap, rai::stat::detail::bulk_pull, rai::stat::dir::in);
-<<<<<<< HEAD:banano/node/bootstrap.cpp
-					auto this_l (shared_from_this ());
-					socket->async_read (receive_buffer, sizeof (rai::uint256_union) + sizeof (rai::uint256_union), [this_l, header](boost::system::error_code const & ec, size_t size_a) {
-						this_l->receive_bulk_pull_action (ec, size_a, header);
-=======
 					auto this_l (shared_from_this ());
 					socket->async_read (receive_buffer, sizeof (rai::uint256_union) + sizeof (rai::uint256_union), [this_l, header](boost::system::error_code const & ec, size_t size_a) {
 						this_l->receive_bulk_pull_action (ec, size_a, header);
@@ -1378,7 +1346,6 @@ void rai::bootstrap_server::receive_header_action (boost::system::error_code con
 					auto this_l (shared_from_this ());
 					socket->async_read (receive_buffer, sizeof (rai::uint256_union) + sizeof (rai::uint128_union) + sizeof (uint8_t), [this_l, header](boost::system::error_code const & ec, size_t size_a) {
 						this_l->receive_bulk_pull_account_action (ec, size_a, header);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/bootstrap.cpp
 					});
 					break;
 				}
@@ -1445,8 +1412,6 @@ void rai::bootstrap_server::receive_bulk_pull_action (boost::system::error_code 
 	}
 }
 
-<<<<<<< HEAD:banano/node/bootstrap.cpp
-=======
 void rai::bootstrap_server::receive_bulk_pull_account_action (boost::system::error_code const & ec, size_t size_a, rai::message_header const & header_a)
 {
 	if (!ec)
@@ -1467,7 +1432,6 @@ void rai::bootstrap_server::receive_bulk_pull_account_action (boost::system::err
 	}
 }
 
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/bootstrap.cpp
 void rai::bootstrap_server::receive_bulk_pull_blocks_action (boost::system::error_code const & ec, size_t size_a, rai::message_header const & header_a)
 {
 	if (!ec)
@@ -2412,11 +2376,7 @@ void rai::bulk_push_server::received_block (boost::system::error_code const & ec
 rai::frontier_req_server::frontier_req_server (std::shared_ptr<rai::bootstrap_server> const & connection_a, std::unique_ptr<rai::frontier_req> request_a) :
 connection (connection_a),
 current (request_a->start.number () - 1),
-<<<<<<< HEAD:banano/node/bootstrap.cpp
-info (0, 0, 0, 0, 0, 0),
-=======
 info (0, 0, 0, 0, 0, 0, rai::epoch::epoch_0),
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/bootstrap.cpp
 request (std::move (request_a)),
 send_buffer (std::make_shared<std::vector<uint8_t>> ())
 {

@@ -1,13 +1,7 @@
-<<<<<<< HEAD:banano/bananode/entry.cpp
+#include <banano/node/cli.hpp>
 #include <banano/node/node.hpp>
 #include <banano/node/testing.hpp>
 #include <banano/bananode/daemon.hpp>
-=======
-#include <rai/node/cli.hpp>
-#include <rai/node/node.hpp>
-#include <rai/node/testing.hpp>
-#include <rai/rai_node/daemon.hpp>
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/rai_node/entry.cpp
 
 #include <argon2.h>
 
@@ -43,12 +37,7 @@ int main (int argc, char * const * argv)
 	boost::program_options::variables_map vm;
 	try
 	{
-<<<<<<< HEAD:banano/bananode/entry.cpp
-		banano_daemon::daemon daemon;
-		daemon.run (data_path);
-=======
 		boost::program_options::store (boost::program_options::parse_command_line (argc, argv, description), vm);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/rai_node/entry.cpp
 	}
 	catch (boost::program_options::error const & err)
 	{
@@ -160,29 +149,7 @@ int main (int argc, char * const * argv)
 			rai::transaction transaction (node.node->store.environment, nullptr, false);
 			std::cout << boost::str (boost::format ("Frontier count: %1%\n") % node.node->store.account_count (transaction));
 		}
-<<<<<<< HEAD:banano/bananode/entry.cpp
-	}
-	else if (vm.count ("debug_account_count"))
-	{
-		rai::inactive_node node (data_path);
-		rai::transaction transaction (node.node->store.environment, nullptr, false);
-		std::cout << boost::str (boost::format ("Frontier count: %1%\n") % node.node->store.account_count (transaction));
-	}
-	else if (vm.count ("debug_mass_activity"))
-	{
-		rai::system system (24000, 1);
-		size_t count (1000000);
-		system.generate_mass_activity (count, *system.nodes[0]);
-	}
-	else if (vm.count ("debug_profile_kdf"))
-	{
-		rai::uint256_union result;
-		rai::uint256_union salt (0);
-		std::string password ("");
-		for (; true;)
-=======
 		else if (vm.count ("debug_mass_activity"))
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/rai_node/entry.cpp
 		{
 			rai::system system (24000, 1);
 			size_t count (1000000);
@@ -366,17 +333,5 @@ int main (int argc, char * const * argv)
 			result = -1;
 		}
 	}
-<<<<<<< HEAD:banano/bananode/entry.cpp
-	else if (vm.count ("version"))
-	{
-		std::cout << "Version " << BANANO_VERSION_MAJOR << "." << BANANO_VERSION_MINOR << std::endl;
-	}
-	else
-	{
-		std::cout << description << std::endl;
-		result = -1;
-	}
-=======
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/rai_node/entry.cpp
 	return result;
 }

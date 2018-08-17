@@ -1,18 +1,10 @@
 #pragma once
 
-<<<<<<< HEAD:banano/node/node.hpp
-#include <banano/ledger.hpp>
+#include <banano/secure/ledger.hpp>
 #include <banano/lib/work.hpp>
 #include <banano/node/bootstrap.hpp>
 #include <banano/node/stats.hpp>
 #include <banano/node/wallet.hpp>
-=======
-#include <rai/lib/work.hpp>
-#include <rai/node/bootstrap.hpp>
-#include <rai/node/stats.hpp>
-#include <rai/node/wallet.hpp>
-#include <rai/secure/ledger.hpp>
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/node.hpp
 
 #include <condition_variable>
 #include <memory>
@@ -73,16 +65,10 @@ public:
 	// Tell the network our view of the winner
 	void broadcast_winner (MDB_txn *);
 	// Change our winner to agree with the network
-<<<<<<< HEAD:banano/node/node.hpp
-	void compute_rep_votes (MDB_txn *, std::shared_ptr<rai::block>);
-	// Confirm this block if quorum is met
-	void confirm_if_quorum (MDB_txn *);
-=======
 	void compute_rep_votes (MDB_txn *);
 	// Confirm this block if quorum is met
 	void confirm_if_quorum (MDB_txn *);
 	void log_votes (rai::tally_t const &);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/node.hpp
 	rai::votes votes;
 	rai::node & node;
 	std::unordered_map<rai::account, rai::vote_info> last_votes;
@@ -130,17 +116,10 @@ public:
 	// Maximum number of conflicts to vote on per interval, lowest root hash first
 	static unsigned constexpr announcements_per_interval = 32;
 	// Minimum number of block announcements
-<<<<<<< HEAD:banano/node/node.hpp
-	static unsigned constexpr announcement_min = 4;
-	// Threshold to start logging blocks haven't yet been confirmed
-	static unsigned constexpr announcement_long = 20;
-	static unsigned constexpr announce_interval_ms = (rai::banano_network == rai::banano_networks::banano_test_network) ? 10 : 16000;
-=======
 	static unsigned constexpr announcement_min = 2;
 	// Threshold to start logging blocks haven't yet been confirmed
 	static unsigned constexpr announcement_long = 20;
 	static unsigned constexpr announce_interval_ms = (rai::rai_network == rai::rai_networks::rai_test_network) ? 10 : 16000;
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/node.hpp
 	static size_t constexpr election_history_size = 2048;
 
 private:
@@ -249,10 +228,7 @@ public:
 	// List of all peers
 	std::deque<rai::endpoint> list ();
 	std::map<rai::endpoint, unsigned> list_version ();
-<<<<<<< HEAD:banano/node/node.hpp
-=======
 	std::vector<peer_information> list_vector ();
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/node.hpp
 	// A list of random peers sized for the configured rebroadcast fanout
 	std::deque<rai::endpoint> list_fanout ();
 	// Get the next peer for attempting bootstrap
@@ -434,11 +410,7 @@ public:
 	boost::asio::ip::udp::resolver resolver;
 	rai::node & node;
 	bool on;
-<<<<<<< HEAD:banano/node/node.hpp
 	static uint16_t const node_port = rai::banano_network == rai::banano_networks::banano_live_network ? 7071 : 54000;
-=======
-	static uint16_t const node_port = rai::rai_network == rai::rai_networks::rai_live_network ? 7075 : 54000;
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/node.hpp
 };
 class logging
 {
@@ -522,13 +494,8 @@ public:
 	std::string callback_target;
 	int lmdb_max_dbs;
 	rai::stat_config stat_config;
-<<<<<<< HEAD:banano/node/node.hpp
-	rai::block_hash state_block_parse_canary;
-	rai::block_hash state_block_generate_canary;
-=======
 	rai::uint256_union epoch_block_link;
 	rai::account epoch_block_signer;
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/node.hpp
 	static std::chrono::seconds constexpr keepalive_period = std::chrono::seconds (60);
 	static std::chrono::seconds constexpr keepalive_cutoff = keepalive_period * 5;
 	static std::chrono::minutes constexpr wallet_backup_interval = std::chrono::minutes (5);
@@ -548,13 +515,9 @@ class vote_processor
 {
 public:
 	vote_processor (rai::node &);
-<<<<<<< HEAD:banano/node/node.hpp
-	rai::vote_code vote (std::shared_ptr<rai::vote>, rai::endpoint);
-=======
 	void vote (std::shared_ptr<rai::vote>, rai::endpoint);
 	rai::vote_code vote_blocking (MDB_txn *, std::shared_ptr<rai::vote>, rai::endpoint);
 	void flush ();
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/node.hpp
 	rai::node & node;
 	void stop ();
 
@@ -588,11 +551,7 @@ public:
 	void stop ();
 	void flush ();
 	bool full ();
-<<<<<<< HEAD:banano/node/node.hpp
-	void add (std::shared_ptr<rai::block>);
-=======
 	void add (std::shared_ptr<rai::block>, std::chrono::steady_clock::time_point);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/node.hpp
 	void force (std::shared_ptr<rai::block>);
 	bool should_log ();
 	bool have_blocks ();
@@ -680,10 +639,7 @@ public:
 	rai::block_arrival block_arrival;
 	rai::online_reps online_reps;
 	rai::stat stats;
-<<<<<<< HEAD:banano/node/node.hpp
-=======
 	rai::keypair node_id;
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/node.hpp
 	static double constexpr price_max = 16.0;
 	static double constexpr free_cutoff = 1024.0;
 	static std::chrono::seconds constexpr period = std::chrono::seconds (60);

@@ -922,11 +922,7 @@ TEST (rpc, history)
 	ASSERT_NE (nullptr, receive);
 	auto node0 (system.nodes[0]);
 	rai::genesis genesis;
-<<<<<<< HEAD:banano/core_test/rpc.cpp
 	rai::state_block usend (rai::genesis_account, node0->latest (rai::genesis_account), rai::genesis_account, rai::genesis_amount - rai::kBAN_ratio, rai::genesis_account, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
-=======
-	rai::state_block usend (rai::genesis_account, node0->latest (rai::genesis_account), rai::genesis_account, rai::genesis_amount - rai::Gxrb_ratio, rai::genesis_account, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/rpc.cpp
 	rai::state_block ureceive (rai::genesis_account, usend.hash (), rai::genesis_account, rai::genesis_amount, usend.hash (), rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	rai::state_block uchange (rai::genesis_account, ureceive.hash (), rai::keypair ().pub, rai::genesis_amount, 0, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	{
@@ -1532,16 +1528,8 @@ TEST (rpc, version)
 	ASSERT_EQ (200, response1.status);
 	ASSERT_EQ ("1", response1.json.get<std::string> ("rpc_version"));
 	ASSERT_EQ (200, response1.status);
-<<<<<<< HEAD:banano/core_test/rpc.cpp
 	ASSERT_EQ ("10", response1.json.get<std::string> ("store_version"));
 	ASSERT_EQ (boost::str (boost::format ("Banano %1%.%2%") % BANANO_VERSION_MAJOR % BANANO_VERSION_MINOR), response1.json.get<std::string> ("node_vendor"));
-=======
-	{
-		rai::transaction transaction (system.nodes[0]->store.environment, nullptr, false);
-		ASSERT_EQ (std::to_string (node1->store.version_get (transaction)), response1.json.get<std::string> ("store_version"));
-	}
-	ASSERT_EQ (boost::str (boost::format ("RaiBlocks %1%.%2%") % RAIBLOCKS_VERSION_MAJOR % RAIBLOCKS_VERSION_MINOR), response1.json.get<std::string> ("node_vendor"));
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/rpc.cpp
 	auto headers (response1.resp.base ());
 	auto allowed_origin (headers.at ("Access-Control-Allow-Origin"));
 	auto allowed_headers (headers.at ("Access-Control-Allow-Headers"));
@@ -3350,11 +3338,7 @@ TEST (rpc, block_create_state_open)
 	rai::keypair key;
 	rai::genesis genesis;
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
-<<<<<<< HEAD:banano/core_test/rpc.cpp
 	auto send_block (system.wallet (0)->send_action (rai::test_genesis_key.pub, key.pub, rai::kBAN_ratio));
-=======
-	auto send_block (system.wallet (0)->send_action (rai::test_genesis_key.pub, key.pub, rai::Gxrb_ratio));
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/rpc.cpp
 	ASSERT_NE (nullptr, send_block);
 	boost::property_tree::ptree request;
 	request.put ("action", "block_create");
@@ -3617,13 +3601,8 @@ TEST (rpc, online_reps)
 {
 	rai::system system (24000, 2);
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
-<<<<<<< HEAD:banano/core_test/rpc.cpp
 	ASSERT_TRUE (system.nodes[1]->online_reps.online_stake ().is_zero ());
 	system.wallet (0)->send_action (rai::test_genesis_key.pub, rai::test_genesis_key.pub, rai::kBAN_ratio);
-=======
-	ASSERT_TRUE (system.nodes[1]->online_reps.online_stake () == system.nodes[1]->config.online_weight_minimum.number ());
-	system.wallet (0)->send_action (rai::test_genesis_key.pub, rai::test_genesis_key.pub, rai::Gxrb_ratio);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/rpc.cpp
 	auto iterations (0);
 	while (system.nodes[1]->online_reps.online_stake () == system.nodes[1]->config.online_weight_minimum.number ())
 	{
@@ -3677,13 +3656,7 @@ TEST (rpc, confirmation_history)
 	auto hash (item->second.get<std::string> ("hash"));
 	auto tally (item->second.get<std::string> ("tally"));
 	ASSERT_EQ (block->hash ().to_string (), hash);
-<<<<<<< HEAD:banano/core_test/rpc.cpp
 	ASSERT_EQ ((rai::genesis_amount - rai::kBAN_ratio).convert_to<std::string> (), tally);
-=======
-	rai::amount tally_num;
-	tally_num.decode_dec (tally);
-	assert (tally_num == rai::genesis_amount || tally_num == (rai::genesis_amount - rai::Gxrb_ratio));
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/rpc.cpp
 	system.stop ();
 }
 

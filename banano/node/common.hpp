@@ -1,12 +1,7 @@
 #pragma once
 
-<<<<<<< HEAD:banano/node/common.hpp
-#include <banano/common.hpp>
+#include <banano/secure/common.hpp>
 #include <banano/lib/interface.h>
-=======
-#include <rai/lib/interface.h>
-#include <rai/secure/common.hpp>
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/common.hpp
 
 #include <boost/asio.hpp>
 
@@ -170,11 +165,7 @@ public:
 	void block_type_set (rai::block_type);
 	bool ipv4_only ();
 	void ipv4_only_set (bool);
-<<<<<<< HEAD:banano/node/common.hpp
 	static std::array<uint8_t, 2> constexpr magic_number = rai::banano_network == rai::banano_networks::banano_test_network ? std::array<uint8_t, 2> ({ 'B', 'Z' }) : rai::banano_network == rai::banano_networks::banano_beta_network ? std::array<uint8_t, 2> ({ 'B', 'Y' }) : std::array<uint8_t, 2> ({ 'B', 'X' });
-=======
-	static std::array<uint8_t, 2> constexpr magic_number = rai::rai_network == rai::rai_networks::rai_test_network ? std::array<uint8_t, 2>{ { 'R', 'A' } } : rai::rai_network == rai::rai_networks::rai_beta_network ? std::array<uint8_t, 2>{ { 'R', 'B' } } : std::array<uint8_t, 2>{ { 'R', 'C' } };
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/common.hpp
 	uint8_t version_max;
 	uint8_t version_using;
 	uint8_t version_min;
@@ -218,10 +209,7 @@ public:
 	void deserialize_publish (rai::stream &, rai::message_header const &);
 	void deserialize_confirm_req (rai::stream &, rai::message_header const &);
 	void deserialize_confirm_ack (rai::stream &, rai::message_header const &);
-<<<<<<< HEAD:banano/node/common.hpp
-=======
 	void deserialize_node_id_handshake (rai::stream &, rai::message_header const &);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/common.hpp
 	bool at_end (rai::stream &);
 	rai::message_visitor & visitor;
 	rai::work_pool & pool;
@@ -325,8 +313,6 @@ class bulk_push : public message
 public:
 	bulk_push ();
 	bulk_push (rai::message_header const &);
-<<<<<<< HEAD:banano/node/common.hpp
-=======
 	bool deserialize (rai::stream &) override;
 	void serialize (rai::stream &) override;
 	void visit (rai::message_visitor &) const override;
@@ -336,7 +322,6 @@ class node_id_handshake : public message
 public:
 	node_id_handshake (bool &, rai::stream &, rai::message_header const &);
 	node_id_handshake (boost::optional<rai::block_hash>, boost::optional<std::pair<rai::account, rai::signature>>);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/common.hpp
 	bool deserialize (rai::stream &) override;
 	void serialize (rai::stream &) override;
 	void visit (rai::message_visitor &) const override;

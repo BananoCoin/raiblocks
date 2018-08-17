@@ -77,11 +77,7 @@ TEST (wallets, DISABLED_wallet_create_max)
 	rai::system system (24000, 1);
 	bool error (false);
 	rai::wallets wallets (error, *system.nodes[0]);
-<<<<<<< HEAD:banano/core_test/wallets.cpp
-	const int nonWalletDbs = 16;
-=======
 	const int nonWalletDbs = 19;
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/wallets.cpp
 	for (int i = 0; i < system.nodes[0]->config.lmdb_max_dbs - nonWalletDbs; i++)
 	{
 		rai::keypair key;

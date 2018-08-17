@@ -108,11 +108,6 @@ TEST (peer_container, fill_random_part)
 	ASSERT_TRUE (std::all_of (target.begin () + half, target.end (), [](rai::endpoint const & endpoint_a) { return endpoint_a == rai::endpoint (boost::asio::ip::address_v6::any (), 0); }));
 }
 
-<<<<<<< HEAD:banano/core_test/peer_container.cpp
-TEST (peer_container, list_fanout)
-{
-	rai::peer_container peers (rai::endpoint{});
-=======
 TEST (peer_container, cap_max_legacy_peers)
 {
 	rai::peer_container peers (rai::endpoint{});
@@ -126,7 +121,6 @@ TEST (peer_container, cap_max_legacy_peers)
 TEST (peer_container, list_fanout)
 {
 	rai::peer_container peers (rai::endpoint{});
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/peer_container.cpp
 	auto list1 (peers.list_fanout ());
 	ASSERT_TRUE (list1.empty ());
 	for (auto i (0); i < 1000; ++i)

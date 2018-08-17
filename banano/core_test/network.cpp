@@ -69,27 +69,11 @@ TEST (network, send_node_id_handshake)
 	auto initial (system.nodes[0]->stats.count (rai::stat::type::message, rai::stat::detail::node_id_handshake, rai::stat::dir::in));
 	auto initial_node1 (node1->stats.count (rai::stat::type::message, rai::stat::detail::node_id_handshake, rai::stat::dir::in));
 	system.nodes[0]->network.send_keepalive (node1->network.endpoint ());
-<<<<<<< HEAD:banano/core_test/network.cpp
 	auto initial (system.nodes[0]->stats.count (rai::stat::type::message, rai::stat::detail::keepalive, rai::stat::dir::in));
 	ASSERT_EQ (0, system.nodes[0]->peers.list ().size ());
 	ASSERT_EQ (0, node1->peers.list ().size ());
 	auto iterations (0);
 	while (system.nodes[0]->stats.count (rai::stat::type::message, rai::stat::detail::keepalive, rai::stat::dir::in) == initial)
-=======
-	ASSERT_EQ (0, system.nodes[0]->peers.list ().size ());
-	ASSERT_EQ (0, node1->peers.list ().size ());
-	auto iterations (0);
-	while (node1->stats.count (rai::stat::type::message, rai::stat::detail::node_id_handshake, rai::stat::dir::in) == initial_node1)
-	{
-		system.poll ();
-		++iterations;
-		ASSERT_LT (iterations, 200);
-	}
-	ASSERT_EQ (0, system.nodes[0]->peers.list ().size ());
-	ASSERT_EQ (1, node1->peers.list ().size ());
-	iterations = 0;
-	while (system.nodes[0]->stats.count (rai::stat::type::message, rai::stat::detail::node_id_handshake, rai::stat::dir::in) < initial + 2)
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/network.cpp
 	{
 		system.poll ();
 		++iterations;

@@ -1,13 +1,7 @@
 #include <gtest/gtest.h>
-<<<<<<< HEAD:banano/core_test/block_store.cpp
 #include <banano/node/common.hpp>
 #include <banano/node/node.hpp>
-#include <banano/versioning.hpp>
-=======
-#include <rai/node/common.hpp>
-#include <rai/node/node.hpp>
-#include <rai/secure/versioning.hpp>
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/block_store.cpp
+#include <banano/secure/versioning.hpp>
 
 #include <fstream>
 

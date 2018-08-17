@@ -9,13 +9,8 @@
         "chain_request_limit": "16384"
     },
     "node": {
-<<<<<<< HEAD
-        "version": "8",
-        "peering_port": "7071",
-=======
         "version": "12",
-        "peering_port": "7075",
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c
+        "peering_port": "7071",
         "bootstrap_fraction_numerator": "1",
         "receive_minimum": "100000000000000000000000000000",
         "logging": {

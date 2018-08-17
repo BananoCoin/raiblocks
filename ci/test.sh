@@ -48,11 +48,7 @@ run_tests() {
     xvfb_run_ ./qt_test
     qt_test_res=${?}
 
-<<<<<<< HEAD
-    ${TIMEOUT_CMD} ${TIMEOUT_TIME_ARG} ${TIMEOUT_SEC-420} ./load_test ./bananode -s 150
-=======
-    ${TIMEOUT_CMD} ${TIMEOUT_TIME_ARG} ${TIMEOUT_SEC-${TIMEOUT_DEFAULT}} ./load_test ./rai_node -s 150
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c
+    ${TIMEOUT_CMD} ${TIMEOUT_TIME_ARG} ${TIMEOUT_SEC-${TIMEOUT_DEFAULT}} ./load_test ./bananode -s 150
     load_test_res=${?}
 
     echo "Core Test return code: ${core_test_res}"

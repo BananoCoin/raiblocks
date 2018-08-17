@@ -1,13 +1,8 @@
 #include <cryptopp/filters.h>
 #include <cryptopp/randpool.h>
 #include <gtest/gtest.h>
-<<<<<<< HEAD:banano/core_test/ledger.cpp
 #include <banano/node/stats.hpp>
 #include <banano/node/testing.hpp>
-=======
-#include <rai/node/stats.hpp>
-#include <rai/node/testing.hpp>
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/ledger.cpp
 
 // Init returns an error if it can't open files at the path
 TEST (ledger, store_error)
@@ -600,27 +595,16 @@ TEST (system, generate_send_existing)
 	while (info2.block_count < info1.block_count + 2)
 	{
 		system.poll ();
-<<<<<<< HEAD:banano/core_test/ledger.cpp
-		++iterations1;
-		ASSERT_LT (iterations1, 200);
-=======
 		++iterations;
 		ASSERT_LT (iterations, 300);
 		rai::transaction transaction (system.wallet (0)->store.environment, nullptr, false);
 		ASSERT_FALSE (system.nodes[0]->store.account_get (transaction, rai::test_genesis_key.pub, info2));
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/ledger.cpp
 	}
 	ASSERT_EQ (info1.block_count + 2, info2.block_count);
 	ASSERT_EQ (info2.balance, rai::genesis_amount / 3);
 	{
-<<<<<<< HEAD:banano/core_test/ledger.cpp
-		system.poll ();
-		++iterations2;
-		ASSERT_LT (iterations2, 200);
-=======
 		rai::transaction transaction (system.wallet (0)->store.environment, nullptr, false);
 		ASSERT_NE (system.nodes[0]->ledger.amount (transaction, info2.head), 0);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/ledger.cpp
 	}
 	system.stop ();
 	runner.join ();
@@ -805,17 +789,10 @@ TEST (votes, check_signature)
 	ASSERT_EQ (1, votes1->votes.rep_votes.size ());
 	auto vote1 (std::make_shared<rai::vote> (rai::test_genesis_key.pub, rai::test_genesis_key.prv, 1, send1));
 	vote1->signature.bytes[0] ^= 1;
-<<<<<<< HEAD:banano/core_test/ledger.cpp
-	ASSERT_EQ (rai::vote_code::invalid, node1.vote_processor.vote (vote1, rai::endpoint ()));
-	vote1->signature.bytes[0] ^= 1;
-	ASSERT_EQ (rai::vote_code::vote, node1.vote_processor.vote (vote1, rai::endpoint ()));
-	ASSERT_EQ (rai::vote_code::replay, node1.vote_processor.vote (vote1, rai::endpoint ()));
-=======
 	ASSERT_EQ (rai::vote_code::invalid, node1.vote_processor.vote_blocking (transaction, vote1, rai::endpoint ()));
 	vote1->signature.bytes[0] ^= 1;
 	ASSERT_EQ (rai::vote_code::vote, node1.vote_processor.vote_blocking (transaction, vote1, rai::endpoint ()));
 	ASSERT_EQ (rai::vote_code::replay, node1.vote_processor.vote_blocking (transaction, vote1, rai::endpoint ()));
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/ledger.cpp
 }
 
 TEST (votes, add_one)
@@ -933,11 +910,7 @@ TEST (votes, add_old)
 	auto send2 (std::make_shared<rai::send_block> (genesis.hash (), key2.pub, 0, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0));
 	auto vote2 (std::make_shared<rai::vote> (rai::test_genesis_key.pub, rai::test_genesis_key.prv, 1, send2));
 	votes1->last_votes[rai::test_genesis_key.pub].time = std::chrono::steady_clock::now () - std::chrono::seconds (20);
-<<<<<<< HEAD:banano/core_test/ledger.cpp
-	node1.vote_processor.vote (vote2, rai::endpoint ());
-=======
 	node1.vote_processor.vote_blocking (transaction, vote2, rai::endpoint ());
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/ledger.cpp
 	ASSERT_EQ (2, votes1->votes.rep_votes.size ());
 	ASSERT_NE (votes1->votes.rep_votes.end (), votes1->votes.rep_votes.find (rai::test_genesis_key.pub));
 	ASSERT_EQ (*send1, *votes1->votes.rep_votes[rai::test_genesis_key.pub]);
@@ -967,21 +940,13 @@ TEST (votes, add_old_different_account)
 	ASSERT_EQ (1, votes1->votes.rep_votes.size ());
 	ASSERT_EQ (1, votes2->votes.rep_votes.size ());
 	auto vote1 (std::make_shared<rai::vote> (rai::test_genesis_key.pub, rai::test_genesis_key.prv, 2, send1));
-<<<<<<< HEAD:banano/core_test/ledger.cpp
-	auto vote_result1 (node1.vote_processor.vote (vote1, rai::endpoint ()));
-=======
 	rai::transaction transaction (system.nodes[0]->store.environment, nullptr, false);
 	auto vote_result1 (node1.vote_processor.vote_blocking (transaction, vote1, rai::endpoint ()));
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/ledger.cpp
 	ASSERT_EQ (rai::vote_code::vote, vote_result1);
 	ASSERT_EQ (2, votes1->votes.rep_votes.size ());
 	ASSERT_EQ (1, votes2->votes.rep_votes.size ());
 	auto vote2 (std::make_shared<rai::vote> (rai::test_genesis_key.pub, rai::test_genesis_key.prv, 1, send2));
-<<<<<<< HEAD:banano/core_test/ledger.cpp
-	auto vote_result2 (node1.vote_processor.vote (vote2, rai::endpoint ()));
-=======
 	auto vote_result2 (node1.vote_processor.vote_blocking (transaction, vote2, rai::endpoint ()));
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/ledger.cpp
 	ASSERT_EQ (rai::vote_code::vote, vote_result2);
 	ASSERT_EQ (2, votes1->votes.rep_votes.size ());
 	ASSERT_EQ (2, votes2->votes.rep_votes.size ());
@@ -2293,9 +2258,7 @@ TEST (ledger, state_receive_change_rollback)
 	ASSERT_EQ (rai::genesis_amount - rai::kBAN_ratio, ledger.weight (transaction, rai::genesis_account));
 	ASSERT_EQ (0, ledger.weight (transaction, rep.pub));
 }
-<<<<<<< HEAD:banano/core_test/ledger.cpp
-
-TEST (ledger, epoch_blocks_general)
+TEST (ledger, epoch_blocks_receive_upgrade)
 {
 	bool init (false);
 	rai::block_store store (init, rai::unique_path ());
@@ -2304,23 +2267,6 @@ TEST (ledger, epoch_blocks_general)
 	rai::keypair epoch_key;
 	rai::ledger ledger (store, stats, 123, epoch_key.pub);
 	rai::genesis genesis;
-<<<<<<< HEAD:banano/core_test/ledger.cpp
-	rai::send_block parse_canary (genesis.hash (), rai::test_genesis_key.pub, rai::genesis_amount, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
-	rai::send_block generate_canary (parse_canary.hash (), rai::test_genesis_key.pub, rai::genesis_amount, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
-	rai::ledger ledger (store, 0, parse_canary.hash (), generate_canary.hash ());
-	rai::transaction transaction (store.environment, nullptr, true);
-	genesis.initialize (transaction, store);
-	rai::state_block state (rai::test_genesis_key.pub, genesis.hash (), rai::test_genesis_key.pub, rai::genesis_amount - rai::kBAN_ratio, rai::test_genesis_key.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
-	ASSERT_FALSE (ledger.state_block_parsing_enabled (transaction));
-	ASSERT_FALSE (ledger.state_block_generation_enabled (transaction));
-	ASSERT_EQ (rai::process_result::state_block_disabled, ledger.process (transaction, state).code);
-	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, parse_canary).code);
-	ASSERT_TRUE (ledger.state_block_parsing_enabled (transaction));
-	ASSERT_FALSE (ledger.state_block_generation_enabled (transaction));
-	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, generate_canary).code);
-	ASSERT_TRUE (ledger.state_block_parsing_enabled (transaction));
-	ASSERT_TRUE (ledger.state_block_generation_enabled (transaction));
-=======
 	rai::transaction transaction (store.environment, nullptr, true);
 	genesis.initialize (transaction, store);
 	rai::keypair destination;
@@ -2339,7 +2285,7 @@ TEST (ledger, epoch_blocks_general)
 	ASSERT_EQ (genesis_info.epoch, rai::epoch::epoch_1);
 	rai::change_block change1 (epoch1.hash (), rai::genesis_account, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	ASSERT_EQ (rai::process_result::block_position, ledger.process (transaction, change1).code);
-	rai::state_block send1 (rai::genesis_account, epoch1.hash (), rai::genesis_account, rai::genesis_amount - rai::Gxrb_ratio, destination.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
+	rai::state_block send1 (rai::genesis_account, epoch1.hash (), rai::genesis_account, rai::genesis_amount - rai::kBAN_ratio, destination.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, send1).code);
 	rai::open_block open1 (send1.hash (), rai::genesis_account, destination.pub, destination.prv, destination.pub, 0);
 	ASSERT_EQ (rai::process_result::unreceivable, ledger.process (transaction, open1).code);
@@ -2349,13 +2295,13 @@ TEST (ledger, epoch_blocks_general)
 	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, epoch4).code);
 	rai::receive_block receive1 (epoch4.hash (), send1.hash (), destination.prv, destination.pub, 0);
 	ASSERT_EQ (rai::process_result::block_position, ledger.process (transaction, receive1).code);
-	rai::state_block receive2 (destination.pub, epoch4.hash (), destination.pub, rai::Gxrb_ratio, send1.hash (), destination.prv, destination.pub, 0);
+	rai::state_block receive2 (destination.pub, epoch4.hash (), destination.pub, rai::kBAN_ratio, send1.hash (), destination.prv, destination.pub, 0);
 	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, receive2).code);
 	ASSERT_EQ (0, ledger.balance (transaction, epoch4.hash ()));
-	ASSERT_EQ (rai::Gxrb_ratio, ledger.balance (transaction, receive2.hash ()));
-	ASSERT_EQ (rai::Gxrb_ratio, ledger.amount (transaction, receive2.hash ()));
-	ASSERT_EQ (rai::genesis_amount - rai::Gxrb_ratio, ledger.weight (transaction, rai::genesis_account));
-	ASSERT_EQ (rai::Gxrb_ratio, ledger.weight (transaction, destination.pub));
+	ASSERT_EQ (rai::kBAN_ratio, ledger.balance (transaction, receive2.hash ()));
+	ASSERT_EQ (rai::kBAN_ratio, ledger.amount (transaction, receive2.hash ()));
+	ASSERT_EQ (rai::genesis_amount - rai::kBAN_ratio, ledger.weight (transaction, rai::genesis_account));
+	ASSERT_EQ (rai::kBAN_ratio, ledger.weight (transaction, destination.pub));
 }
 
 TEST (ledger, epoch_blocks_receive_upgrade)
@@ -2370,11 +2316,11 @@ TEST (ledger, epoch_blocks_receive_upgrade)
 	rai::transaction transaction (store.environment, nullptr, true);
 	genesis.initialize (transaction, store);
 	rai::keypair destination;
-	rai::state_block send1 (rai::genesis_account, genesis.hash (), rai::genesis_account, rai::genesis_amount - rai::Gxrb_ratio, destination.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
+	rai::state_block send1 (rai::genesis_account, genesis.hash (), rai::genesis_account, rai::genesis_amount - rai::kBAN_ratio, destination.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, send1).code);
-	rai::state_block epoch1 (rai::genesis_account, send1.hash (), rai::genesis_account, rai::genesis_amount - rai::Gxrb_ratio, 123, epoch_key.prv, epoch_key.pub, 0);
+	rai::state_block epoch1 (rai::genesis_account, send1.hash (), rai::genesis_account, rai::genesis_amount - rai::kBAN_ratio, 123, epoch_key.prv, epoch_key.pub, 0);
 	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, epoch1).code);
-	rai::state_block send2 (rai::genesis_account, epoch1.hash (), rai::genesis_account, rai::genesis_amount - rai::Gxrb_ratio * 2, destination.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
+	rai::state_block send2 (rai::genesis_account, epoch1.hash (), rai::genesis_account, rai::genesis_amount - rai::kBAN_ratio * 2, destination.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, send2).code);
 	rai::open_block open1 (send1.hash (), destination.pub, destination.pub, destination.prv, destination.pub, 0);
 	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, open1).code);
@@ -2414,7 +2360,4 @@ TEST (ledger, epoch_blocks_fork)
 	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, send1).code);
 	rai::state_block epoch1 (rai::genesis_account, genesis.hash (), rai::genesis_account, rai::genesis_amount, 123, epoch_key.prv, epoch_key.pub, 0);
 	ASSERT_EQ (rai::process_result::fork, ledger.process (transaction, epoch1).code);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/ledger.cpp
 }
-=======
->>>>>>> V14.1:rai/core_test/ledger.cpp

@@ -169,26 +169,6 @@ TEST (node, quick_confirm)
 	system.wallet (0)->insert_adhoc (key.prv);
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
 	auto send (std::make_shared<rai::send_block> (previous, key.pub, system.nodes[0]->delta () + 1, rai::test_genesis_key.prv, rai::test_genesis_key.pub, system.work.generate (previous)));
-<<<<<<< HEAD:banano/core_test/node.cpp
-	system.nodes[0]->process_active (send);
-	auto iterations (0);
-	while (system.nodes[0]->balance (key.pub).is_zero ())
-	{
-		system.poll ();
-		++iterations;
-		ASSERT_LT (iterations, 200);
-	}
-}
-
-TEST (node, node_receive_quorum)
-{
-	rai::system system (24000, 1);
-	rai::keypair key;
-	rai::block_hash previous (system.nodes[0]->latest (rai::test_genesis_key.pub));
-	system.wallet (0)->insert_adhoc (key.prv);
-	auto send (std::make_shared<rai::send_block> (previous, key.pub, rai::genesis_amount - rai::Gxrb_ratio, rai::test_genesis_key.prv, rai::test_genesis_key.pub, system.work.generate (previous)));
-=======
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/node.cpp
 	system.nodes[0]->process_active (send);
 	auto iterations (0);
 	while (!system.nodes[0]->ledger.block_exists (send->hash ()))
@@ -551,11 +531,7 @@ TEST (node_config, serialization)
 	config1.receive_minimum = 10;
 	config1.online_weight_minimum = 10;
 	config1.online_weight_quorum = 10;
-<<<<<<< HEAD:banano/core_test/node.cpp
-	config1.password_fanout = 10;
-=======
 	config1.password_fanout = 20;
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/node.cpp
 	config1.enable_voting = false;
 	config1.callback_address = "test";
 	config1.callback_port = 10;
@@ -710,12 +686,8 @@ TEST (node, fork_publish)
 		ASSERT_NE (node1.active.roots.end (), existing);
 		auto election (existing->election);
 		rai::transaction transaction (node1.store.environment, nullptr, false);
-<<<<<<< HEAD:banano/core_test/node.cpp
-		election->compute_rep_votes (transaction, election->status.winner);
-=======
 		election->compute_rep_votes (transaction);
 		node1.vote_processor.flush ();
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/node.cpp
 		ASSERT_EQ (2, election->votes.rep_votes.size ());
 		node1.process_active (send2);
 		node1.block_processor.flush ();
@@ -1078,12 +1050,8 @@ TEST (node, fork_no_vote_quorum)
 	ASSERT_TRUE (node3.latest (rai::test_genesis_key.pub) == send1.hash ());
 }
 
-<<<<<<< HEAD:banano/core_test/node.cpp
-TEST (node, fork_pre_confirm)
-=======
 // Disabled because it sometimes takes way too long (but still eventually finishes)
 TEST (node, DISABLED_fork_pre_confirm)
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/node.cpp
 {
 	rai::system system (24000, 3);
 	auto & node0 (*system.nodes[0]);
@@ -1110,11 +1078,7 @@ TEST (node, DISABLED_fork_pre_confirm)
 	{
 		system.poll ();
 		++iterations;
-<<<<<<< HEAD:banano/core_test/node.cpp
-		ASSERT_LT (iterations, 400);
-=======
 		ASSERT_LT (iterations, 600);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/node.cpp
 	}
 	auto block1 (system.wallet (0)->send_action (rai::test_genesis_key.pub, key2.pub, rai::genesis_amount / 3));
 	ASSERT_NE (nullptr, block1);
@@ -1122,11 +1086,7 @@ TEST (node, DISABLED_fork_pre_confirm)
 	{
 		system.poll ();
 		++iterations;
-<<<<<<< HEAD:banano/core_test/node.cpp
-		ASSERT_LT (iterations, 400);
-=======
 		ASSERT_LT (iterations, 600);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/node.cpp
 	}
 	rai::keypair key3;
 	rai::keypair key4;
@@ -1148,57 +1108,6 @@ TEST (node, DISABLED_fork_pre_confirm)
 	}
 }
 
-<<<<<<< HEAD:banano/core_test/node.cpp
-=======
-// Sometimes hangs on the bootstrap_initiator.bootstrap call
-TEST (node, DISABLED_fork_stale)
-{
-	rai::system system1 (24000, 1);
-	system1.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
-	rai::system system2 (24001, 1);
-	auto & node1 (*system1.nodes[0]);
-	auto & node2 (*system2.nodes[0]);
-	node2.bootstrap_initiator.bootstrap (node1.network.endpoint ());
-	node2.peers.rep_response (node1.network.endpoint (), rai::test_genesis_key.pub, rai::genesis_amount);
-	rai::genesis genesis;
-	rai::keypair key1;
-	rai::keypair key2;
-	auto send3 (std::make_shared<rai::state_block> (rai::test_genesis_key.pub, genesis.hash (), rai::test_genesis_key.pub, rai::genesis_amount - rai::Mxrb_ratio, key1.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0));
-	node1.work_generate_blocking (*send3);
-	node1.process_active (send3);
-	auto iterations (0);
-	while (node2.block (send3->hash ()) == nullptr)
-	{
-		system1.poll ();
-		system2.poll ();
-		++iterations;
-		ASSERT_LT (iterations, 200);
-	}
-	auto send1 (std::make_shared<rai::state_block> (rai::test_genesis_key.pub, send3->hash (), rai::test_genesis_key.pub, rai::genesis_amount - 2 * rai::Mxrb_ratio, key1.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0));
-	node1.work_generate_blocking (*send1);
-	auto send2 (std::make_shared<rai::state_block> (rai::test_genesis_key.pub, send3->hash (), rai::test_genesis_key.pub, rai::genesis_amount - 2 * rai::Mxrb_ratio, key2.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0));
-	node1.work_generate_blocking (*send2);
-	{
-		rai::transaction transaction1 (node1.store.environment, nullptr, true);
-		ASSERT_EQ (rai::process_result::progress, node1.ledger.process (transaction1, *send1).code);
-		rai::transaction transaction2 (node2.store.environment, nullptr, true);
-		ASSERT_EQ (rai::process_result::progress, node2.ledger.process (transaction2, *send2).code);
-	}
-	node1.process_active (send1);
-	node1.process_active (send2);
-	node2.process_active (send1);
-	node2.process_active (send2);
-	node2.bootstrap_initiator.bootstrap (node1.network.endpoint ());
-	while (node2.block (send1->hash ()) == nullptr)
-	{
-		system1.poll ();
-		system2.poll ();
-		++iterations;
-		ASSERT_LT (iterations, 200);
-	}
-}
-
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/node.cpp
 TEST (node, broadcast_elected)
 {
 	rai::system system (24000, 3);
@@ -1296,12 +1205,8 @@ TEST (node, rep_self_vote)
 	auto existing (active.roots.find (block0->root ()));
 	ASSERT_NE (active.roots.end (), existing);
 	rai::transaction transaction (node0->store.environment, nullptr, false);
-<<<<<<< HEAD:banano/core_test/node.cpp
-	existing->election->compute_rep_votes (transaction, existing->election->status.winner);
-=======
 	existing->election->compute_rep_votes (transaction);
 	node0->vote_processor.flush ();
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/node.cpp
 	auto & rep_votes (existing->election->votes.rep_votes);
 	ASSERT_EQ (3, rep_votes.size ());
 	ASSERT_NE (rep_votes.end (), rep_votes.find (rai::test_genesis_key.pub));
@@ -1426,11 +1331,7 @@ TEST (node, DISABLED_unconfirmed_send)
 		ASSERT_GT (200, iterations0);
 	}
 	auto latest (node1.latest (key0.pub));
-<<<<<<< HEAD:banano/core_test/node.cpp
-	rai::send_block send2 (latest, rai::genesis_account, rai::BAN_ratio, key0.prv, key0.pub, node0.work_generate_blocking (latest));
-=======
-	rai::state_block send2 (key0.pub, latest, rai::genesis_account, rai::Mxrb_ratio, rai::genesis_account, key0.prv, key0.pub, node0.work_generate_blocking (latest));
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/node.cpp
+	rai::state_block send2 (key0.pub, latest, rai::genesis_account, rai::BAN_ratio, rai::genesis_account, key0.prv, key0.pub, node0.work_generate_blocking (latest));
 	{
 		rai::transaction transaction (node1.store.environment, nullptr, true);
 		ASSERT_EQ (rai::process_result::progress, node1.ledger.process (transaction, send2).code);
@@ -1652,102 +1553,8 @@ TEST (node, online_reps)
 {
 	rai::system system (24000, 2);
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
-<<<<<<< HEAD:banano/core_test/node.cpp
 	ASSERT_TRUE (system.nodes[1]->online_reps.online_stake ().is_zero ());
 	system.wallet (0)->send_action (rai::test_genesis_key.pub, rai::test_genesis_key.pub, rai::kBAN_ratio);
-=======
-	ASSERT_EQ (system.nodes[1]->config.online_weight_minimum.number (), system.nodes[1]->online_reps.online_stake ());
-	system.wallet (0)->send_action (rai::test_genesis_key.pub, rai::test_genesis_key.pub, rai::Gxrb_ratio);
-	auto iterations (0);
-	while (system.nodes[1]->online_reps.online_stake () == system.nodes[1]->config.online_weight_minimum.number ())
-	{
-		system.poll ();
-		++iterations;
-		ASSERT_LT (iterations, 200);
-	}
-}
-
-TEST (node, block_confirm)
-{
-	rai::system system (24000, 1);
-	rai::genesis genesis;
-	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
-	auto send1 (std::make_shared<rai::state_block> (rai::test_genesis_key.pub, genesis.hash (), rai::test_genesis_key.pub, rai::genesis_amount - rai::Gxrb_ratio, rai::test_genesis_key.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, system.nodes[0]->work_generate_blocking (genesis.hash ())));
-	{
-		rai::transaction transaction (system.nodes[0]->store.environment, nullptr, true);
-		ASSERT_EQ (rai::process_result::progress, system.nodes[0]->ledger.process (transaction, *send1).code);
-	}
-	system.nodes[0]->block_confirm (send1);
-	ASSERT_TRUE (system.nodes[0]->active.confirmed.empty ());
-	auto iterations (0);
-	while (system.nodes[0]->active.confirmed.empty ())
-	{
-		system.poll ();
-		++iterations;
-		ASSERT_LT (iterations, 200);
-	}
-}
-
-TEST (node, block_arrival)
-{
-	rai::system system (24000, 1);
-	auto & node (*system.nodes[0]);
-	ASSERT_EQ (0, node.block_arrival.arrival.size ());
-	rai::block_hash hash1 (1);
-	node.block_arrival.add (hash1);
-	ASSERT_EQ (1, node.block_arrival.arrival.size ());
-	node.block_arrival.add (hash1);
-	ASSERT_EQ (1, node.block_arrival.arrival.size ());
-	rai::block_hash hash2 (2);
-	node.block_arrival.add (hash2);
-	ASSERT_EQ (2, node.block_arrival.arrival.size ());
-}
-
-TEST (node, block_arrival_size)
-{
-	rai::system system (24000, 1);
-	auto & node (*system.nodes[0]);
-	auto time (std::chrono::steady_clock::now () - rai::block_arrival::arrival_time_min - std::chrono::seconds (5));
-	rai::block_hash hash (0);
-	for (auto i (0); i < rai::block_arrival::arrival_size_min * 2; ++i)
-	{
-		node.block_arrival.arrival.insert (rai::block_arrival_info{ time, hash });
-		++hash.qwords[0];
-	}
-	ASSERT_EQ (rai::block_arrival::arrival_size_min * 2, node.block_arrival.arrival.size ());
-	node.block_arrival.recent (0);
-	ASSERT_EQ (rai::block_arrival::arrival_size_min, node.block_arrival.arrival.size ());
-}
-
-TEST (node, block_arrival_time)
-{
-	rai::system system (24000, 1);
-	auto & node (*system.nodes[0]);
-	auto time (std::chrono::steady_clock::now ());
-	rai::block_hash hash (0);
-	for (auto i (0); i < rai::block_arrival::arrival_size_min * 2; ++i)
-	{
-		node.block_arrival.arrival.insert (rai::block_arrival_info{ time, hash });
-		++hash.qwords[0];
-	}
-	ASSERT_EQ (rai::block_arrival::arrival_size_min * 2, node.block_arrival.arrival.size ());
-	node.block_arrival.recent (0);
-	ASSERT_EQ (rai::block_arrival::arrival_size_min * 2, node.block_arrival.arrival.size ());
-}
-
-TEST (node, confirm_quorum)
-{
-	rai::system system (24000, 1);
-	rai::genesis genesis;
-	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
-	// Put greater than online_weight_minimum in pending so quorum can't be reached
-	auto send1 (std::make_shared<rai::state_block> (rai::test_genesis_key.pub, genesis.hash (), rai::test_genesis_key.pub, rai::Gxrb_ratio, rai::test_genesis_key.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, system.nodes[0]->work_generate_blocking (genesis.hash ())));
-	{
-		rai::transaction transaction (system.nodes[0]->store.environment, nullptr, true);
-		ASSERT_EQ (rai::process_result::progress, system.nodes[0]->ledger.process (transaction, *send1).code);
-	}
-	system.wallet (0)->send_action (rai::test_genesis_key.pub, rai::test_genesis_key.pub, rai::Gxrb_ratio);
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/core_test/node.cpp
 	auto iterations (0);
 	while (system.nodes[0]->active.roots.empty ())
 	{

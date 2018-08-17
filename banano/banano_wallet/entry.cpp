@@ -1,16 +1,8 @@
-<<<<<<< HEAD:banano/banano_wallet/entry.cpp
-#include <banano/qt/qt.hpp>
-
-#include <banano/icon.hpp>
+#include <banano/node/cli.hpp>
 #include <banano/node/rpc.hpp>
 #include <banano/node/working.hpp>
-=======
-#include <rai/node/cli.hpp>
-#include <rai/node/rpc.hpp>
-#include <rai/node/working.hpp>
-#include <rai/qt/qt.hpp>
-#include <rai/rai_wallet/icon.hpp>
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/rai_wallet/entry.cpp
+#include <banano/qt/qt.hpp>
+#include <banano/rai_wallet/icon.hpp>
 
 #include <boost/make_shared.hpp>
 #include <boost/program_options.hpp>

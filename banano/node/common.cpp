@@ -99,39 +99,13 @@ void rai::message_parser::deserialize_buffer (uint8_t const * buffer_a, size_t s
 	rai::message_header header (error, stream);
 	if (!error)
 	{
-<<<<<<< HEAD:banano/node/common.cpp
-		switch (header.type)
-		{
-			case rai::message_type::keepalive:
-			{
-				deserialize_keepalive (stream, header);
-				break;
-			}
-			case rai::message_type::publish:
-			{
-				deserialize_publish (stream, header);
-				break;
-			}
-			case rai::message_type::confirm_req:
-			{
-				deserialize_confirm_req (stream, header);
-				break;
-			}
-			case rai::message_type::confirm_ack:
-			{
-				deserialize_confirm_ack (stream, header);
-				break;
-			}
-			default:
-=======
-		if (rai::rai_network == rai::rai_networks::rai_beta_network && header.version_using < rai::protocol_version)
+		if (rai::banano_network == rai::banano_networks::banano_beta_network && header.version_using < rai::protocol_version)
 		{
 			status = parse_status::outdated_version;
 		}
 		else
 		{
 			switch (header.type)
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/common.cpp
 			{
 				case rai::message_type::keepalive:
 				{
@@ -249,8 +223,6 @@ void rai::message_parser::deserialize_confirm_ack (rai::stream & stream_a, rai::
 	}
 }
 
-<<<<<<< HEAD:banano/node/common.cpp
-=======
 void rai::message_parser::deserialize_node_id_handshake (rai::stream & stream_a, rai::message_header const & header_a)
 {
 	bool error_l (false);
@@ -265,7 +237,6 @@ void rai::message_parser::deserialize_node_id_handshake (rai::stream & stream_a,
 	}
 }
 
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c:rai/node/common.cpp
 bool rai::message_parser::at_end (rai::stream & stream_a)
 {
 	uint8_t junk;

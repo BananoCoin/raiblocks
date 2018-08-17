@@ -3,11 +3,7 @@
     "rpc_enable": "true",
     "rpc": {
         "address": "::ffff:0.0.0.0",
-<<<<<<< HEAD
-        "port": "7072",
-=======
         "port": "55000",
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c
         "enable_control": "true",
         "frontier_request_limit": "16384",
         "chain_request_limit": "16384"
@@ -43,15 +39,7 @@
             "peers-beta.banano.co.in"
         ],
         "preconfigured_representatives": [
-<<<<<<< HEAD
             "ban_1apu7qupt4onpjthr5myfis6a1xo15n68dcghgsmpje1uytmgk8gbi1fp14x"
-=======
-            "xrb_3betaz86ypbygpqbookmzpnmd5jhh4efmd8arr9a3n4bdmj1zgnzad7xpmfp",
-            "xrb_1beta1ayfkpj1tfbhi3e9ihkocjkqi6ms5e4xrbmbybqnkza1e5jrake8wai",
-            "xrb_1beta3kp4j9tn7pko3apyyzbrx789jpc98ep3ufqazanbcxiyyoxmxhjtbfn",
-            "xrb_1beta4nkzb3g6b1a1qhae89earmz3gk3kfrp3f8hyztm8qyjkeyz9kajfutq",
-            "xrb_1beta5zm6rq4ghp6c9n99j8fz3am8e44dewae5ea7addsjtfo8umsafmr1r7"
->>>>>>> bcc55f99bcdf5c03bd766639c1dcd14bcb6ee56c
         ],
         "online_weight_minimum": "60000000000000000000000000000000000000",
         "online_weight_quorum": "50",

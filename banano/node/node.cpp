@@ -922,8 +922,6 @@ lmdb_max_dbs (128)
 		case rai::banano_networks::banano_beta_network:
 			preconfigured_peers.push_back ("peers-beta.banano.co.in");
 			preconfigured_representatives.push_back (rai::account ("22DB2DF76D0AB4B474FC0E7E6C324403B500E8432D4E7BB33B4580DFB53748CE"));
-			state_block_parse_canary = rai::block_hash ("73C5E7D1EE86BBCE2163B8155C812D7CD0624C513EB52D32D487094058EABF70");
-			state_block_generate_canary = rai::block_hash ("2B8BE5A233991AED695820578A958895BD5D317AA9B8C27A02D9ADF9094D3B3B");
 			break;
 		case rai::banano_networks::banano_live_network:
 			preconfigured_peers.push_back ("tarzan.banano.co.in");
@@ -1883,7 +1881,7 @@ stats (config.stat_config)
 					{
 						break;
 					}
-					BOOST_LOG (log) << "Using bootstrap rep weight: " << account.to_account () << " -> " << weight.format_balance (BAN_RATIO, 0, true) << " BAN";
+					BOOST_LOG (log) << "Using bootstrap rep weight: " << account.to_account () << " -> " << weight.format_balance (BAN_ratio, 0, true) << " BAN";
 					ledger.bootstrap_weights[account] = weight.number ();
 				}
 			}
@@ -2464,7 +2462,7 @@ int rai::node::price (rai::uint128_t const & balance_a, int amount_a)
 	for (auto i (0); i < amount_a; ++i)
 	{
 		balance_l -= rai::kBAN_ratio;
-		auto balance_scaled ((balance_l / rai::BAN_RATIO).convert_to<double> ());
+		auto balance_scaled ((balance_l / rai::BAN_ratio).convert_to<double> ());
 		auto units (balance_scaled / 1000.0);
 		auto unit_price (((free_cutoff - units) / free_cutoff) * price_max);
 		result += std::min (std::max (0.0, unit_price), price_max);

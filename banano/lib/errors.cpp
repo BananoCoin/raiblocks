@@ -1,4 +1,4 @@
-#include "rai/lib/errors.hpp"
+#include "banano/lib/errors.hpp"
 
 std::string nano::error_common_messages::message (int ev) const
 {

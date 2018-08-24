@@ -230,7 +230,7 @@ target_compile_definitions(blake2 PRIVATE -D__SSE2__)
 add_subdirectory(banano/secure)
 add_subdirectory(banano/lib)
 add_subdirectory(banano/node)
-add_subdirectory(banano/rai_node)
+add_subdirectory(banano/bananode)
 
 if (BANANO_TEST)
     if(WIN32)

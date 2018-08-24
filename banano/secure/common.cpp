@@ -1,9 +1,9 @@
-#include <banano/common.hpp>
+#include <banano/secure/common.hpp>
 
-#include <banano/blockstore.hpp>
+#include <banano/secure/blockstore.hpp>
 #include <banano/lib/interface.h>
 #include <banano/node/common.hpp>
-#include <banano/versioning.hpp>
+#include <banano/secure/versioning.hpp>
 
 #include <boost/property_tree/json_parser.hpp>
 

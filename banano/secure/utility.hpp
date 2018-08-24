@@ -14,7 +14,7 @@
 
 #include <lmdb/libraries/liblmdb/lmdb.h>
 
-#include <banano/config.hpp>
+#include <banano/lib/config.hpp>
 #include <banano/lib/interface.h>
 #include <banano/lib/numbers.hpp>
 

@@ -1,6 +1,6 @@
 #include <queue>
-#include <banano/blockstore.hpp>
-#include <banano/versioning.hpp>
+#include <banano/secure/blockstore.hpp>
+#include <banano/secure/versioning.hpp>
 
 namespace
 {

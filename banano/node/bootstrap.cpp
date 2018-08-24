@@ -1437,7 +1437,7 @@ void rai::bootstrap_server::receive_bulk_pull_account_action (boost::system::err
 		{
 			if (node->config.logging.bulk_pull_logging ())
 			{
-				BOOST_LOG (node->log) << boost::str (boost::format ("Received bulk pull account for %1% with a minimum amount of %2%") % request->account.to_account () % rai::amount (request->minimum_amount).format_balance (rai::Mxrb_ratio, 10, true));
+				BOOST_LOG (node->log) << boost::str (boost::format ("Received bulk pull account for %1% with a minimum amount of %2%") % request->account.to_account () % rai::amount (request->minimum_amount).format_balance (rai::BAN_ratio, 10, true));
 			}
 			add_request (std::unique_ptr<rai::message> (request.release ()));
 			receive ();

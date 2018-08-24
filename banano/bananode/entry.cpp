@@ -1,7 +1,7 @@
 #include <banano/node/cli.hpp>
 #include <banano/node/node.hpp>
 #include <banano/node/testing.hpp>
-#include <banano/bananode/daemon.hpp>
+#include <banano/rai_node/daemon.hpp>
 
 #include <argon2.h>
 

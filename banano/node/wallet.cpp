@@ -40,7 +40,7 @@ void rai::wallet_store::seed (rai::raw_key & prv_a, MDB_txn * transaction_a)
 	rai::wallet_value value (entry_get_raw (transaction_a, rai::wallet_store::seed_special));
 	rai::raw_key password_l;
 	wallet_key (password_l, transaction_a);
-	prv_a.decrypt (value.key, password_l, salt (transaction_a).owords[0]);
+	prv_a.decrypt (value.key, password_l, salt (transaction_a).owords[seed_iv_index]);
 }
 
 void rai::wallet_store::seed_set (MDB_txn * transaction_a, rai::raw_key const & prv_a)
@@ -48,7 +48,7 @@ void rai::wallet_store::seed_set (MDB_txn * transaction_a, rai::raw_key const & 
 	rai::raw_key password_l;
 	wallet_key (password_l, transaction_a);
 	rai::uint256_union ciphertext;
-	ciphertext.encrypt (prv_a, password_l, salt (transaction_a).owords[0]);
+	ciphertext.encrypt (prv_a, password_l, salt (transaction_a).owords[seed_iv_index]);
 	entry_put_raw (transaction_a, rai::wallet_store::seed_special, rai::wallet_value (ciphertext, 0));
 	deterministic_clear (transaction_a);
 }
@@ -126,13 +126,27 @@ bool rai::wallet_store::valid_password (MDB_txn * transaction_a)
 	rai::raw_key wallet_key_l;
 	wallet_key (wallet_key_l, transaction_a);
 	rai::uint256_union check_l;
-	check_l.encrypt (zero, wallet_key_l, salt (transaction_a).owords[0]);
+	check_l.encrypt (zero, wallet_key_l, salt (transaction_a).owords[check_iv_index]);
 	bool ok = check (transaction_a) == check_l;
 	return ok;
 }
 
-bool rai::wallet_store::attempt_password (MDB_txn * transaction_a, std::string const & password_a)
+bool rai::wallet_store::attempt_password (rai::transaction & transaction, std::string const & password_a)
 {
+	std::shared_ptr<rai::transaction> write_transaction;
+	MDB_txn * transaction_a;
+
+	if (!transaction.open_for_write)
+	{
+		write_transaction = std::make_shared<rai::transaction> (environment, nullptr, true);
+		transaction_a = *write_transaction;
+	}
+	else
+	{
+		transaction_a = transaction;
+	}
+
+
 	bool result = false;
 	{
 		std::lock_guard<std::recursive_mutex> lock (mutex);
@@ -143,13 +157,18 @@ bool rai::wallet_store::attempt_password (MDB_txn * transaction_a, std::string c
 	}
 	if (!result)
 	{
-		if (version (transaction_a) == version_1)
+		switch (version (transaction_a))
 		{
-			upgrade_v1_v2 ();
-		}
-		if (version (transaction_a) == version_2)
-		{
-			upgrade_v2_v3 ();
+			case version_1:
+				upgrade_v1_v2 (transaction_a);
+			case version_2:
+				upgrade_v2_v3 (transaction_a);
+			case version_3:
+				upgrade_v3_v4 (transaction_a);
+			case version_4:
+				break;
+			default:
+				assert (false);
 		}
 	}
 	return result;
@@ -245,10 +264,6 @@ rai::mdb_val rai::wallet_value::val () const
 	return rai::mdb_val (sizeof (*this), const_cast<rai::wallet_value *> (this));
 }
 
-unsigned const rai::wallet_store::version_1 (1);
-unsigned const rai::wallet_store::version_2 (2);
-unsigned const rai::wallet_store::version_3 (3);
-unsigned const rai::wallet_store::version_current (version_3);
 // Wallet version number
 rai::uint256_union const rai::wallet_store::version_special (0);
 // Random number used to salt private key encryption
@@ -264,6 +279,8 @@ rai::uint256_union const rai::wallet_store::seed_special (5);
 // Current key index for deterministic keys
 rai::uint256_union const rai::wallet_store::deterministic_index_special (6);
 int const rai::wallet_store::special_count (7);
+size_t const rai::wallet_store::check_iv_index (0);
+size_t const rai::wallet_store::seed_iv_index (1);
 
 rai::wallet_store::wallet_store (bool & init_a, rai::kdf & kdf_a, rai::transaction & transaction_a, rai::account representative_a, unsigned fanout_a, std::string const & wallet_a, std::string const & json_a) :
 password (0, fanout_a),
@@ -357,7 +374,7 @@ environment (transaction_a.environment)
 			wallet_key_enc.data = encrypted;
 			wallet_key_mem.value_set (wallet_key_enc);
 			rai::uint256_union check;
-			check.encrypt (zero, wallet_key, salt_l.owords[0]);
+			check.encrypt (zero, wallet_key, salt_l.owords[check_iv_index]);
 			entry_put_raw (transaction_a, rai::wallet_store::check_special, rai::wallet_value (check, 0));
 			entry_put_raw (transaction_a, rai::wallet_store::representative_special, rai::wallet_value (representative_a, 0));
 			rai::raw_key seed;
@@ -413,7 +430,7 @@ rai::public_key rai::wallet_store::insert_adhoc (MDB_txn * transaction_a, rai::r
 	rai::raw_key password_l;
 	wallet_key (password_l, transaction_a);
 	rai::uint256_union ciphertext;
-	ciphertext.encrypt (prv, password_l, salt (transaction_a).owords[0]);
+	ciphertext.encrypt (prv, password_l, pub.owords[0].number ());
 	entry_put_raw (transaction_a, pub, rai::wallet_value (ciphertext, 0));
 	return pub;
 }
@@ -498,7 +515,7 @@ bool rai::wallet_store::fetch (MDB_txn * transaction_a, rai::public_key const & 
 					// Ad-hoc keys
 					rai::raw_key password_l;
 					wallet_key (password_l, transaction_a);
-					prv.decrypt (value.key, password_l, salt (transaction_a).owords[0]);
+					prv.decrypt (value.key, password_l, pub.owords[0].number ());
 					break;
 				}
 				default:
@@ -636,9 +653,8 @@ void rai::wallet_store::version_put (MDB_txn * transaction_a, unsigned version_a
 	entry_put_raw (transaction_a, rai::wallet_store::version_special, rai::wallet_value (entry, 0));
 }
 
-void rai::wallet_store::upgrade_v1_v2 ()
+void rai::wallet_store::upgrade_v1_v2 (MDB_txn * transaction)
 {
-	rai::transaction transaction (environment, nullptr, true);
 	assert (version (transaction) == 1);
 	rai::raw_key zero_password;
 	rai::wallet_value value (entry_get_raw (transaction, rai::wallet_store::wallet_key_special));
@@ -680,15 +696,56 @@ void rai::wallet_store::upgrade_v1_v2 ()
 	version_put (transaction, 2);
 }
 
-void rai::wallet_store::upgrade_v2_v3 ()
+void rai::wallet_store::upgrade_v2_v3 (MDB_txn * transaction)
 {
-	rai::transaction transaction (environment, nullptr, true);
 	assert (version (transaction) == 2);
 	rai::raw_key seed;
 	random_pool.GenerateBlock (seed.data.bytes.data (), seed.data.bytes.size ());
 	seed_set (transaction, seed);
 	entry_put_raw (transaction, rai::wallet_store::deterministic_index_special, rai::wallet_value (rai::uint256_union (0), 0));
 	version_put (transaction, 3);
+}
+
+void rai::wallet_store::upgrade_v3_v4 (MDB_txn * transaction)
+{
+	assert (version (transaction) == 3);
+	version_put (transaction, 4);
+	assert (valid_password (transaction));
+	rai::raw_key seed;
+	rai::wallet_value value (entry_get_raw (transaction, rai::wallet_store::seed_special));
+	rai::raw_key password_l;
+	wallet_key (password_l, transaction);
+	seed.decrypt (value.key, password_l, salt (transaction).owords[0]);
+	rai::uint256_union ciphertext;
+	ciphertext.encrypt (seed, password_l, salt (transaction).owords[seed_iv_index]);
+	entry_put_raw (transaction, rai::wallet_store::seed_special, rai::wallet_value (ciphertext, 0));
+	for (auto i (begin (transaction)), n (end ()); i != n; ++i)
+	{
+		rai::wallet_value value (i->second);
+		if (!value.key.is_zero ())
+		{
+			switch (key_type (i->second))
+			{
+				case rai::key_type::adhoc:
+				{
+					rai::raw_key key;
+					if (fetch (transaction, i->first.uint256 (), key))
+					{
+						// Key failed to decrypt despite valid password
+						key.decrypt (value.key, password_l, salt (transaction).owords[0]);
+						rai::uint256_union new_key_ciphertext;
+						new_key_ciphertext.encrypt (key, password_l, i->first.uint256 ().owords[0].number ());
+						rai::wallet_value new_value (new_key_ciphertext, value.work);
+						mdb_cursor_put (i.cursor, i->first, new_value.val (), MDB_CURRENT);
+					}
+				}
+				case rai::key_type::deterministic:
+					break;
+				default:
+					assert (false);
+			}
+		}
+	}
 }
 
 void rai::kdf::phs (rai::raw_key & result_a, std::string const & password_a, rai::uint256_union const & salt_a)
@@ -726,7 +783,7 @@ void rai::wallet::enter_initial_password ()
 			// Newly created wallets have a zero key
 			store.rekey (transaction, "");
 		}
-		enter_password ("");
+		enter_password (transaction, "");
 	}
 }
 
@@ -737,9 +794,8 @@ bool rai::wallet::valid_password ()
 	return result;
 }
 
-bool rai::wallet::enter_password (std::string const & password_a)
+bool rai::wallet::enter_password (rai::transaction & transaction, std::string const & password_a)
 {
-	rai::transaction transaction (store.environment, nullptr, false);
 	auto result (store.attempt_password (transaction, password_a));
 	if (!result)
 	{
@@ -750,6 +806,13 @@ bool rai::wallet::enter_password (std::string const & password_a)
 	}
 	lock_observer (result, password_a.empty ());
 	return result;
+}
+
+bool rai::wallet::enter_password (std::string const & password_a)
+{
+	rai::transaction transaction (store.environment, nullptr, true);
+	std::lock_guard<std::recursive_mutex> lock (store.mutex);
+	return enter_password (transaction, password_a);
 }
 
 rai::public_key rai::wallet::deterministic_insert (MDB_txn * transaction_a, bool generate_work_a)
@@ -1235,9 +1298,6 @@ thread ([this]() { do_wallet_actions (); })
 			auto wallet (std::make_shared<rai::wallet> (error, transaction, node_a, text));
 			if (!error)
 			{
-				node_a.background ([wallet]() {
-					wallet->enter_initial_password ();
-				});
 				items[id] = wallet;
 			}
 			else
@@ -1245,6 +1305,10 @@ thread ([this]() { do_wallet_actions (); })
 				// Couldn't open wallet
 			}
 		}
+	}
+	for (auto i (items.begin ()), n (items.end ()); i != n; ++i)
+	{
+		i->second->enter_initial_password ();
 	}
 }
 
@@ -1276,9 +1340,7 @@ std::shared_ptr<rai::wallet> rai::wallets::create (rai::uint256_union const & id
 	if (!error)
 	{
 		items[id_a] = result;
-		node.background ([result]() {
-			result->enter_initial_password ();
-		});
+		result->enter_initial_password ();
 	}
 	return result;
 }

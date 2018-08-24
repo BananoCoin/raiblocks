@@ -144,5 +144,6 @@ public:
 	operator MDB_txn * () const;
 	MDB_txn * handle;
 	rai::mdb_env & environment;
+	bool open_for_write;
 };
 }

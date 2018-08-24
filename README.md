@@ -34,11 +34,8 @@ For more information, see [Banano.co.in](http://banano.co.in/).
 - [Fritter](http://twitter.com/bananocoin)
 - [GitHub wiki](http://github.com/bananocoin/banano/wiki)
 - [BananoVault](https://vault.banano.co.in)
-<<<<<<< HEAD
-=======
 - [Telegram](https://t.me/joinchat/HX-rIQ-t9Ad2xRcJjztVzg)
 - [Banano.how all links at a glance](http://banano.how/)
->>>>>>> fd067296c5fd6414f4bba545190a026dac1c77cb
 
 ### Build instructions
 - [Building Banano from source](https://github.com/BananoCoin/banano/wiki/Building-a-Bananode-from-sources)

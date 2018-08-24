@@ -116,7 +116,7 @@ public:
 	static int const special_count;
 	static unsigned const kdf_full_work = 64 * 1024;
 	static unsigned const kdf_test_work = 8;
-	static unsigned const kdf_work = rai::rai_network == rai::rai_networks::rai_test_network ? kdf_test_work : kdf_full_work;
+	static unsigned const kdf_work = rai::banano_network == rai::banano_networks::banano_test_network ? kdf_test_work : kdf_full_work;
 	rai::kdf & kdf;
 	rai::mdb_env & environment;
 	MDB_dbi handle;

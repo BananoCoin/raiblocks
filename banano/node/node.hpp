@@ -1,10 +1,10 @@
 #pragma once
 
-#include <banano/secure/ledger.hpp>
 #include <banano/lib/work.hpp>
 #include <banano/node/bootstrap.hpp>
 #include <banano/node/stats.hpp>
 #include <banano/node/wallet.hpp>
+#include <banano/secure/ledger.hpp>
 
 #include <condition_variable>
 #include <memory>

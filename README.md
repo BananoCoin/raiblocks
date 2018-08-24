@@ -13,14 +13,17 @@ We've applied the philosophy of "do one thing and do it well", giving you perfor
 * Fungible (& Edible).
 * Daily potassium airdrops.
 * Ripe for memes.
-* Literally grows on tree's, no mining required.
+* Literally grows on trees, no mining required.
 * Not a Shitcoin (until digested).
 * No more confusing prefixes, Bananos contain Banoshis.
 * Replay Protection to stop attackers from executing replay attacks from chain X on chain Y and vice versa.
 
 ### Key facts
 * Forked from NANO (raiblocks)
-* Total Supply: 3,400,000,000
+master
+
+* Total Supply: 3,402,823,669.20
+
 * Born in Feb. 2018, Mainnet launch April 1st, 2018
 
 For more information, see [Banano.co.in](http://banano.co.in/).
@@ -34,6 +37,8 @@ For more information, see [Banano.co.in](http://banano.co.in/).
 - [Fritter](http://twitter.com/bananocoin)
 - [GitHub wiki](http://github.com/bananocoin/banano/wiki)
 - [BananoVault](https://vault.banano.co.in)
+- [Telegram](https://t.me/joinchat/HX-rIQ-t9Ad2xRcJjztVzg)
+- [Banano.how all links at a glance](http://banano.how/)
 
 ### Build instructions
 - [Building Banano from source](https://github.com/BananoCoin/banano/wiki/Building-a-Bananode-from-sources)

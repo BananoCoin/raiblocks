@@ -1,12 +1,8 @@
 #pragma once
 
-<<<<<<< HEAD:banano/node/testing.hpp
-#include <banano/node/node.hpp>
-=======
 #include <chrono>
-#include <rai/lib/errors.hpp>
-#include <rai/node/node.hpp>
->>>>>>> 270cfe2c88615f7be132eb23d84dc7306b69e83e:rai/node/testing.hpp
+#include <banano/lib/errors.hpp>
+#include <banano/node/node.hpp>
 
 namespace rai
 {

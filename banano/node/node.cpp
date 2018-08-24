@@ -929,7 +929,7 @@ lmdb_max_dbs (128)
 			preconfigured_peers.push_back ("tarzan.banano.co.in");
 			preconfigured_representatives.push_back (rai::account ("36B3AFC042CCB5099DC163FA2BFE42D6E486991B685EAAB0DF73714D91A59400"));
 			preconfigured_representatives.push_back (rai::account ("29126049B40D1755C0A1C02B71646EEAB9E1707C16E94B47100F3228D59B1EB2"));
-			// 2018-08-28 UTC 00:00 in unix time
+			// 2018-09-01 UTC 00:00 in unix time
 			// Technically, time_t is never defined to be unix time, but compilers implement it as such
 			generate_hash_votes_at = std::chrono::system_clock::from_time_t (1535760000);
 			break;
@@ -1860,9 +1860,9 @@ stats (config.stat_config)
 	peers.online_weight_minimum = config.online_weight_minimum.number ();
 	if (rai::banano_network == rai::banano_networks::banano_live_network)
 	{
-		extern const char banano_bootstrap_weights[];
-		extern const size_t banano_bootstrap_weights_size;
-		rai::bufferstream weight_stream ((const uint8_t *)banano_bootstrap_weights, banano_bootstrap_weights_size);
+		extern const char rai_bootstrap_weights[];
+		extern const size_t rai_bootstrap_weights_size;
+		rai::bufferstream weight_stream ((const uint8_t *)rai_bootstrap_weights, rai_bootstrap_weights_size);
 		rai::uint128_union block_height;
 		if (!rai::read (weight_stream, block_height))
 		{
@@ -1909,42 +1909,6 @@ bool rai::node::copy_with_compaction (boost::filesystem::path const & destinatio
 void rai::node::send_keepalive (rai::endpoint const & endpoint_a)
 {
 	network.send_keepalive (rai::map_endpoint_to_v6 (endpoint_a));
-}
-
-void rai::node::process_fork (MDB_txn * transaction_a, std::shared_ptr<rai::block> block_a)
-{
-	auto root (block_a->root ());
-	if (!store.block_exists (transaction_a, block_a->hash ()) && store.root_exists (transaction_a, block_a->root ()))
-	{
-		std::shared_ptr<rai::block> ledger_block (ledger.forked_block (transaction_a, *block_a));
-		if (ledger_block)
-		{
-			std::weak_ptr<rai::node> this_w (shared_from_this ());
-			if (!active.start (std::make_pair (ledger_block, block_a), [this_w, root](std::shared_ptr<rai::block>) {
-				    if (auto this_l = this_w.lock ())
-				    {
-					    auto attempt (this_l->bootstrap_initiator.current_attempt ());
-					    if (attempt)
-					    {
-						    rai::transaction transaction (this_l->store.environment, nullptr, false);
-						    auto account (this_l->ledger.store.frontier_get (transaction, root));
-						    if (!account.is_zero ())
-						    {
-							    attempt->requeue_pull (rai::pull_info (account, root, root));
-						    }
-						    else if (this_l->ledger.store.account_exists (transaction, root))
-						    {
-							    attempt->requeue_pull (rai::pull_info (root, rai::block_hash (0), rai::block_hash (0)));
-						    }
-					    }
-				    }
-			    }))
-			{
-				BOOST_LOG (log) << boost::str (boost::format ("Resolving fork between our block: %1% and block %2% both with root %3%") % ledger_block->hash ().to_string () % block_a->hash ().to_string () % block_a->root ().to_string ());
-				network.broadcast_confirm_req (ledger_block);
-			}
-		}
-	}
 }
 
 void rai::node::process_fork (MDB_txn * transaction_a, std::shared_ptr<rai::block> block_a)
@@ -2031,7 +1995,7 @@ void rai::gap_cache::vote (std::shared_ptr<rai::vote> vote_a)
 				{
 					auto node_l (node.shared ());
 					auto now (std::chrono::steady_clock::now ());
-					node.alarm.add (rai::rai_network == rai::rai_networks::rai_test_network ? now + std::chrono::milliseconds (5) : now + std::chrono::seconds (5), [node_l, hash]() {
+					node.alarm.add (rai::banano_network == rai::banano_networks::banano_test_network ? now + std::chrono::milliseconds (5) : now + std::chrono::seconds (5), [node_l, hash]() {
 						rai::transaction transaction (node_l->store.environment, nullptr, false);
 						if (!node_l->store.block_exists (transaction, hash))
 						{
@@ -2494,13 +2458,13 @@ void rai::node::backup_wallet ()
 
 int rai::node::price (rai::uint128_t const & balance_a, int amount_a)
 {
-	assert (balance_a >= amount_a * rai::kBAN_ratio);
+	assert (balance_a >= amount_a * rai::GRAW_ratio);
 	auto balance_l (balance_a);
 	double result (0.0);
 	for (auto i (0); i < amount_a; ++i)
 	{
-		balance_l -= rai::kBAN_ratio;
-		auto balance_scaled ((balance_l / rai::BAN_ratio).convert_to<double> ());
+		balance_l -= rai::GRAW_ratio;
+		auto balance_scaled ((balance_l / rai::MRAW_ratio).convert_to<double> ());
 		auto units (balance_scaled / 1000.0);
 		auto unit_price (((free_cutoff - units) / free_cutoff) * price_max);
 		result += std::min (std::max (0.0, unit_price), price_max);
@@ -3316,7 +3280,7 @@ bool rai::peer_container::insert (rai::endpoint const & endpoint_a, unsigned ver
 						result = true;
 					}
 				}
-				if (!result && rai_network != rai_networks::rai_test_network)
+				if (!result && banano_network != banano_networks::banano_test_network)
 				{
 					auto peer_it_range (peers.get<rai::peer_by_ip_addr> ().equal_range (endpoint_a.address ()));
 					auto i (peer_it_range.first);
@@ -3568,7 +3532,7 @@ aborted (false)
 	blocks.insert (std::make_pair (block_a->hash (), block_a));
 }
 
-void rai::election::compute_rep_votes (MDB_txn * transaction_a, std::shared_ptr<rai::block> block_a)
+void rai::election::compute_rep_votes (MDB_txn * transaction_a)
 {
 	if (node.config.enable_voting)
 	{
@@ -3581,23 +3545,7 @@ void rai::election::compute_rep_votes (MDB_txn * transaction_a, std::shared_ptr<
 
 void rai::election::confirm_once (MDB_txn * transaction_a)
 {
-	auto tally_l (node.ledger.tally (transaction_a, votes));
-	assert (tally_l.size () > 0);
-	auto winner (tally_l.begin ());
-	auto block_l (winner->second);
-	status.tally = winner->first;
-	rai::uint128_t sum (0);
-	for (auto & i : tally_l)
-	{
-		sum += i.first;
-	}
-	if (sum >= node.config.online_weight_minimum.number () && !(*block_l == *status.winner))
-	{
-		auto node_l (node.shared ());
-		node_l->block_processor.force (block_l);
-		status.winner = block_l;
-	}
-	if (have_quorum (tally_l))
+	if (!confirmed.exchange (true))
 	{
 		auto winner_l (status.winner);
 		auto node_l (node.shared ());

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <banano/secure/ledger.hpp>
 #include <banano/lib/work.hpp>
 #include <banano/node/bootstrap.hpp>
 #include <banano/node/stats.hpp>
 #include <banano/node/wallet.hpp>
+#include <banano/secure/ledger.hpp>
 
 #include <condition_variable>
 #include <memory>
@@ -132,7 +132,7 @@ public:
 	static unsigned constexpr announcement_min = 2;
 	// Threshold to start logging blocks haven't yet been confirmed
 	static unsigned constexpr announcement_long = 20;
-	static unsigned constexpr announce_interval_ms = (rai::rai_network == rai::rai_networks::rai_test_network) ? 10 : 16000;
+	static unsigned constexpr announce_interval_ms = (rai::banano_network == rai::banano_networks::banano_test_network) ? 10 : 16000;
 	static size_t constexpr election_history_size = 2048;
 
 private:

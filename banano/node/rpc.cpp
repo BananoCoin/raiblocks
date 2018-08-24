@@ -3530,11 +3530,6 @@ void rai::rpc_handler::process_request ()
 		auto max_depth_possible (0);
 		for (auto ch : body)
 		{
-			work_peer_add ();
-		}
-		else if (action == "work_peers")
-		{
-			work_peers ();
 			if (ch == '[' || ch == '{')
 			{
 				if (max_depth_possible >= rpc.config.max_json_depth)

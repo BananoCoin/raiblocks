@@ -35,6 +35,7 @@ For more information, see [Banano.co.in](http://banano.co.in/).
 - [GitHub wiki](http://github.com/bananocoin/banano/wiki)
 - [BananoVault](https://vault.banano.co.in)
 - [Telegram](https://t.me/joinchat/HX-rIQ-t9Ad2xRcJjztVzg)
+- [Yellow Pages](https://formatted.github.io/YellowPages/)
 - [Banano.how all links at a glance](http://banano.how/)
 
 ### Build instructions

@@ -32,6 +32,7 @@ For more information, see [Banano.cc](https://banano.cc).
 - [GitHub wiki](http://github.com/bananocoin/banano/wiki)
 - [BananoVault](https://vault.banano.cc)
 - [Telegram](https://t.me/joinchat/HX-rIQ-t9Ad2xRcJjztVzg)
+- [Yellow Pages](https://formatted.github.io/YellowPages/)
 - [Banano.how all links at a glance](http://banano.how/)
 
 ### Build instructions
